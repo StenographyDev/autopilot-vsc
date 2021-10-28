@@ -10,15 +10,20 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:stenography.helloWorld",
+    "onCommand:stenography.autopilot",
+    "onCommand:stenography.autopilot-dryrun",
     "onCommand:stenography.setKey"
   ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "stenography.helloWorld",
-        "title": "Hello World"
+        "command": "stenography.autopilot",
+        "title": "Stenography Autopilot"
+      },
+      {
+        "command": "stenography.autopilot-dryrun",
+        "title": "Stenography Autopilot - Dry Run"
       },
       {
         "command": "stenography.setKey",
