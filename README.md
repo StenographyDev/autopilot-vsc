@@ -17,9 +17,7 @@ New languages are continously being added! [Follow Stenography on Twitter](https
 4. Run Stenography! `ctrl(windows)/cmd(mac) + shift + p` and run `Stenography Autopilot`. This **will** cost API invocations.
 
 
-\!\[feature X\]\(images/feature-x.png\)
-
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+![gif of autopilot](autopilot-vsc.gif)
 
 ## Requirements
 
