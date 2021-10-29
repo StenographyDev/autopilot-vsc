@@ -11,8 +11,7 @@
   ],
   "activationEvents": [
     "onCommand:stenography.autopilot",
-    "onCommand:stenography.autopilot-dryrun",
-    "onCommand:stenography.setKey"
+    "onCommand:stenography.autopilot-dryrun"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -24,12 +23,36 @@
       {
         "command": "stenography.autopilot-dryrun",
         "title": "Stenography Autopilot - Dry Run"
-      },
-      {
-        "command": "stenography.setKey",
-        "title": "Set Stenography Key"
       }
-    ]
+    ],
+    "configuration": [
+			{
+				"title": "Stenography",
+        "description": "Configure Stenography Autopilot",
+				"order": 1,
+				"properties": {
+					"conf.settingsEditor.boolObjectSetting": {
+						"type": "object",
+						"description": "Stenography Call Settings",
+						"properties": {
+							"stack_overflow": {
+								"type": "boolean",
+								"description": "Stack Overflow Suggestions"
+							}
+						},
+						"additionalProperties": false,
+						"default": {
+							"stack_overflow": false
+						}
+					},
+					"conf.settingsEditor.apiKey": {
+						"type": "string",
+						"description": "API Key",
+						"editPresentation": "singlelineText"
+					}
+				}
+			}
+		]
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
