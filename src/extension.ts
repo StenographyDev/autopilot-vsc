@@ -49,9 +49,8 @@ const fetchStenographyAutopilot = async (code: string, language: string, dryRun:
 	};
 
 	try {
-		console.log(fetchUrl);
 		const resp = await fetch(fetchUrl, options);
-		console.log(resp);
+
 		const json: any = await resp.json();
 		if (typeof json === 'string') {
 			throw new Error(json);
