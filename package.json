@@ -1,8 +1,18 @@
 {
   "name": "stenography",
   "displayName": "Stenography",
+  "icon": "s-logo.png",
+  "author": {
+    "name": "Stenography",
+    "url": "https://stenography.dev/"
+  },
+  "publisher": "stenography",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/StenographyDev/autopilot-vsc"
+  },
   "description": "Use Stenography and Stenography Autopilot to close the gap between 🤔 what code does and 💡 what code does",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "engines": {
     "vscode": "^1.61.0"
   },
@@ -26,33 +36,33 @@
       }
     ],
     "configuration": [
-			{
-				"title": "Stenography",
+      {
+        "title": "Stenography",
         "description": "Configure Stenography Autopilot",
-				"order": 1,
-				"properties": {
-					"conf.settingsEditor.stackOverflow": {
-						"type": "object",
-						"description": "Stenography Call Settings",
-						"properties": {
-							"stackOverflow": {
-								"type": "boolean",
-								"description": "Stack Overflow Suggestions"
-							}
-						},
-						"additionalProperties": false,
-						"default": {
-							"stackOverflow": false
-						}
-					},
-					"conf.settingsEditor.apiKey": {
-						"type": "string",
-						"description": "API Key",
-						"editPresentation": "singlelineText"
-					}
-				}
-			}
-		]
+        "order": 1,
+        "properties": {
+          "conf.settingsEditor.stackOverflow": {
+            "type": "object",
+            "description": "Stenography Call Settings",
+            "properties": {
+              "stackOverflow": {
+                "type": "boolean",
+                "description": "Stack Overflow Suggestions"
+              }
+            },
+            "additionalProperties": false,
+            "default": {
+              "stackOverflow": false
+            }
+          },
+          "conf.settingsEditor.apiKey": {
+            "type": "string",
+            "description": "API Key",
+            "editPresentation": "singlelineText"
+          }
+        }
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
@@ -82,7 +92,6 @@
     "webpack-cli": "^4.8.0"
   },
   "dependencies": {
-    "dotenv": "^10.0.0",
     "node-fetch": "^3.0.0"
   }
 }

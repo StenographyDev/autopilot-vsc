@@ -30,7 +30,7 @@ New languages are continously being added! [Follow Stenography on Twitter](https
 
 This extension contributes the following settings:
 
-* `stenography.apiKey`: **[REQUIRED]** set your [Stenography API key](https://stenography.dev/dashboard)
+* `stenography.apiKey`: **[REQUIRED]** set your [Stenography API key](https://stenography.dev/dashboard) in vsc settings (`cmd+,`)
 * `stenography.stackOverflow`: add Stack Overflow search suggestions to your completions
 
 ## Known Issues
