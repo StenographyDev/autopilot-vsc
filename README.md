@@ -2,6 +2,13 @@
 
 Leverage the [Stenography Autopilot API](https://bramses.notion.site/bramses/Stenography-Documentation-08e26294e93a48c09ea5bdf3a78ded00#74e2cb7e877840c3a9fa0a3ca53961ab) to automatically comment your code files in VSC.
 
+Current language support:
+- Javascript
+- Typescript
+- Python
+
+New languages are continously being added! [Follow Stenography on Twitter](https://twitter.com/StenographyDev) to be kept up to date about new languages. 
+
 ## Features
 
 1. Input your API Key! (see **Extension Settings** below)
@@ -16,7 +23,8 @@ Leverage the [Stenography Autopilot API](https://bramses.notion.site/bramses/Ste
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+- VSC
+- Stenography API Key
 
 ## Extension Settings
 
