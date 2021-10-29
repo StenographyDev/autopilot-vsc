@@ -31,18 +31,18 @@
         "description": "Configure Stenography Autopilot",
 				"order": 1,
 				"properties": {
-					"conf.settingsEditor.boolObjectSetting": {
+					"conf.settingsEditor.stackOverflow": {
 						"type": "object",
 						"description": "Stenography Call Settings",
 						"properties": {
-							"stack_overflow": {
+							"stackOverflow": {
 								"type": "boolean",
 								"description": "Stack Overflow Suggestions"
 							}
 						},
 						"additionalProperties": false,
 						"default": {
-							"stack_overflow": false
+							"stackOverflow": false
 						}
 					},
 					"conf.settingsEditor.apiKey": {
