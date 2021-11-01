@@ -41,23 +41,23 @@
         "description": "Configure Stenography Autopilot",
         "order": 1,
         "properties": {
-          "conf.settingsEditor.stackOverflow": {
+          "stenography.autopilotSettings": {
             "type": "object",
-            "description": "Stenography Call Settings",
+            "description": "Autopilot Settings",
             "properties": {
-              "stackOverflow": {
+              "zeroCol": {
                 "type": "boolean",
-                "description": "Stack Overflow Suggestions"
+                "description": "Place comments at column zero or at the start of the explanation character"
               }
             },
             "additionalProperties": false,
             "default": {
-              "stackOverflow": false
+              "zeroCol": false
             }
           },
-          "conf.settingsEditor.apiKey": {
+          "stenography.apiKey": {
             "type": "string",
-            "description": "API Key",
+            "description": "Set your API Key",
             "editPresentation": "singlelineText"
           }
         }
