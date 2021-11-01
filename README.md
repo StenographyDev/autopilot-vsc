@@ -8,6 +8,7 @@ Current language support:
 - Javascript
 - Typescript
 - Python
+- HTML
 
 New languages are continously being added! [Follow Stenography on Twitter](https://twitter.com/StenographyDev) to be kept up to date about new languages. 
 
@@ -45,3 +46,8 @@ This extension contributes the following settings:
 ### 1.0.0
 
 Initial release of Stenography Extension!
+
+### 1.0.1
+
+- Added HTML to list of supported languages
+- Added a setting that allows documentation to be inserted on the first column, instead of where the code block starts

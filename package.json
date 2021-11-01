@@ -12,7 +12,7 @@
     "url": "https://github.com/StenographyDev/autopilot-vsc"
   },
   "description": "Use Stenography and Stenography Autopilot to close the gap between 🤔 what code does and 💡 what code does",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "engines": {
     "vscode": "^1.61.0"
   },
