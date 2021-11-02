@@ -32,13 +32,14 @@ New languages are continously being added! [Follow Stenography on Twitter](https
 This extension contributes the following settings:
 
 * `stenography.apiKey`: **[REQUIRED]** set your [Stenography API key](https://stenography.dev/dashboard) in vsc settings (`cmd+,`)
-* `stenography.stackOverflow`: add Stack Overflow search suggestions to your completions
+* `stenography.autopilotSettings.zeroCol`: documentation to be inserted on the first column, instead of where the code block starts
 
 ## Known Issues
 
 - Replacing current comments above code blocks. Currently Stenography does not replace/overwrite comments due to edge cases of overwriting code that people wrote manually. It will append the newest version one line above the code block (run dry-run to see where Stenography will comment)
 - The empty lines above code blocks. The VSC editor is `thenable` and in order to add explanations correctly, a new line has to be inserted **before** the code block comment is.
 - Stack Overflow Option NYI (to be added soon!)   
+- Sometimes API key wont save to VSC. Try to paste into box and click on outside of the box
 
 
 ## Release Notes
@@ -51,3 +52,8 @@ Initial release of Stenography Extension!
 
 - Added HTML to list of supported languages
 - Added a setting that allows documentation to be inserted on the first column, instead of where the code block starts
+
+### 1.0.2
+
+- Added TSX to list of supported languages
+- More information boxes and error boxes
