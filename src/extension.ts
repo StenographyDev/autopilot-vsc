@@ -108,7 +108,7 @@ const logic = async (editor: vscode.TextEditor | undefined, isDryRun = true) => 
 			progress.report({ increment: 0 });
 			if (code) {
 				if (editor) {
-	
+					let keystrokesSaved = 0;
 					const res = await fetchStenographyAutopilot(code, language, isDryRun);
 					console.log(res);
 					if (res.error) {
@@ -139,6 +139,7 @@ const logic = async (editor: vscode.TextEditor | undefined, isDryRun = true) => 
 							linesA.push({ line: lineAboveNewLine, codeRes: `dry run -- stenography will explain this code block!` });
 						} else {
 							linesA.push({ line: lineAboveNewLine, codeRes: codeBlock.stenographyResult.pm });
+							keystrokesSaved += codeBlock.stenographyResult.pm.length;
 						}		
 					}
 	
@@ -186,6 +187,12 @@ const logic = async (editor: vscode.TextEditor | undefined, isDryRun = true) => 
 						default:
 							vscode.window.showErrorMessage("Language not yet supported");
 							break;
+						}
+
+						if (isDryRun) {
+							vscode.window.showInformationMessage(`Stenography dry run complete!\n\n${res.code_blocks!.length} invocations added!`);
+						} else {
+							vscode.window.showInformationMessage(`Stenography autopilot complete!\n\n${res.code_blocks!.length} invocations added and ${keystrokesSaved} keystrokes saved!`);
 						}
 	
 				}
