@@ -109,6 +109,8 @@ const logic = async (editor: vscode.TextEditor | undefined, isDryRun = true) => 
 			if (code) {
 				if (editor) {
 					let keystrokesSaved = 0;
+					let languageError = false;
+
 					const res = await fetchStenographyAutopilot(code, language, isDryRun);
 					console.log(res);
 					if (res.error) {
@@ -186,10 +188,11 @@ const logic = async (editor: vscode.TextEditor | undefined, isDryRun = true) => 
 							break;
 						default:
 							vscode.window.showErrorMessage("Language not yet supported");
+							languageError = true;
 							break;
 						}
 
-						if (isDryRun) {
+						if (isDryRun && !languageError) {
 							vscode.window.showInformationMessage(`Stenography dry run complete!\n\n${res.code_blocks!.length} invocations added!`);
 						} else {
 							vscode.window.showInformationMessage(`Stenography autopilot complete!\n\n${res.code_blocks!.length} invocations added and ${keystrokesSaved} keystrokes saved!`);
