@@ -44,8 +44,7 @@ This extension contributes the following settings:
 
 - Replacing current comments above code blocks. Currently Stenography does not replace/overwrite comments due to edge cases of overwriting code that people wrote manually. It will append the newest version one line above the code block (run dry-run to see where Stenography will comment)
 - The empty lines above code blocks. The VSC editor is `thenable` and in order to add explanations correctly, a new line has to be inserted **before** the code block comment is.
-- Stack Overflow Option NYI (to be added soon!)   
-- Sometimes API key wont save to VSC. Try to paste into box and click on outside of the box
+- Sometimes API key wont save to VSC. Try to paste into box and click on outside of the box or use the command `Set Stenography API Key`
 
 
 ## Release Notes
@@ -63,3 +62,9 @@ Initial release of Stenography Extension!
 
 - Added TSX to list of supported languages
 - More information boxes and error boxes
+
+### 1.0.3
+
+- Added `Stenography API Key command`
+- Added **[experimental]** code lens mode
+- Adjusted comment blocks so that all start lines line up
