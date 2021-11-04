@@ -12,12 +12,18 @@ Current language support:
 
 New languages are continously being added! [Follow Stenography on Twitter](https://twitter.com/StenographyDev) to be kept up to date about new languages. 
 
-## Features
+## Installation
 
-1. Input your API Key! (see **Extension Settings** below)
-2. On a valid file, hit `ctrl(windows)/cmd(mac) + shift + p` and run `Stenography Autopilot - Dry Run` to see where the AI will comment your code. This won't cost any API invocations.
-3. Remove dry run comments by hitting **undo twice (see Known Issues below)**
-4. Run Stenography! `ctrl(windows)/cmd(mac) + shift + p` and run `Stenography Autopilot`. This **will** cost API invocations.
+1. Input your API Key: `Cmd + Shift + P` -> `Set Stenography API Key`
+
+![setting api key](install.png)
+
+
+## Running
+
+1. On a valid file, hit `ctrl(windows)/cmd(mac) + shift + p` and run `Stenography Autopilot - Dry Run` to see where the AI will comment your code. This **won't** cost any API invocations.
+2. Remove dry run comments by hitting **undo twice (see Known Issues below)**
+3. Run Stenography! `ctrl(windows)/cmd(mac) + shift + p` and run `Stenography Autopilot`. This **will** cost API invocations.
 
 
 ![gif of autopilot](autopilot-vsc.gif)

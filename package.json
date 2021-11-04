@@ -23,11 +23,16 @@
     "onCommand:stenography.autopilot",
     "onCommand:stenography.enableCodeLens",
     "onCommand:stenography.disableCodeLens",
-    "onCommand:stenography.autopilot-dryrun"
+    "onCommand:stenography.autopilot-dryrun",
+    "onCommand:stenography.setKey"
   ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
+      {
+        "command": "stenography.setKey",
+        "title": "Set Stenography API Key"
+      },
       {
         "command": "stenography.autopilot",
         "title": "Stenography Autopilot"
@@ -37,14 +42,12 @@
         "title": "Stenography Autopilot - Dry Run"
       },
       {
-        "title": "Enable CodeLens",
-        "command": "stenography.enableCodeLens",
-        "category": "CodeLens"
+        "title": "Stenography - Enable CodeLens [ALPHA]",
+        "command": "stenography.enableCodeLens"
     },
     {
-        "title": "Disable Codelens",
-        "command": "stenography.disableCodeLens",
-        "category": "CodeLens"
+        "title": "Stenography - Disable Codelens [ALPHA]",
+        "command": "stenography.disableCodeLens"
     }
     ],
     "configuration": [
@@ -61,15 +64,15 @@
                 "type": "boolean",
                 "description": "Place comments at column zero or at the start of the explanation character"
               },
-              "enableCodeLens": {
+              "codeLensMode": {
                 "type": "boolean",
-                "default": false,
-                "description": "Enable CodeLens mode [EXPERIMENTAL]. Will call on files and use invocations automatically!"
+                "description": "Enable CodeLens mode [EXPERIMENTAL]. Will call on files and use invocations automatically! Proceed with caution!"
               }
             },
             "additionalProperties": false,
             "default": {
-              "zeroCol": false
+              "zeroCol": false,
+              "codeLensMode": false
             }
           },
           "stenography.apiKey": {

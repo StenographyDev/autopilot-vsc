@@ -68,8 +68,9 @@ export class CodelensProvider implements vscode.CodeLensProvider {
     codeLensesCache:any = {};
 
     public provideCodeLenses(document: vscode.TextDocument, token: vscode.CancellationToken): vscode.CodeLens[] | Thenable<vscode.CodeLens[]> {
+        console.log(vscode.workspace.getConfiguration("stenography.autopilotSettings").get("codeLensMode", true));
 
-        if (vscode.workspace.getConfiguration("stenography").get("enableCodeLens", true)) {
+        if (vscode.workspace.getConfiguration("stenography.autopilotSettings").get("codeLensMode", false)) {
             const filename:string = document.fileName;
             console.log(filename);
             const fullFileName: string[] | undefined = document.fileName.split('.');
@@ -82,10 +83,6 @@ export class CodelensProvider implements vscode.CodeLensProvider {
                 return this.codeLenses;
             }
             
-            
-
-            
-            
             if (filename in this.documentsCache) {
                 console.log("Already in cache");
                 if (document.getText() !== this.documentsCache[filename]) {
@@ -94,7 +91,6 @@ export class CodelensProvider implements vscode.CodeLensProvider {
             } else {
                 this.documentsCache[filename] = document.getText();
                 console.log("Added to cache");
-                console.log(language)
                 return fetchStenographyAutopilot(document.getText(), language, false).then((data: any) => {
                     console.log(data);
                     if (data.error) {
@@ -120,51 +116,14 @@ export class CodelensProvider implements vscode.CodeLensProvider {
                 });
             }
 
-            // custom
-            // var firstLine = document.lineAt(10);
-            // var lastLine = document.lineAt(document.lineCount - 1);
-            // var textRange = new vscode.Range(firstLine.range.start, firstLine.range.end);
-            // let command = {
-            //     command: "",
-            //     title : "<your custom title based on lineText>"
-            //  };
-            // this.codeLenses.push(new vscode.CodeLens(textRange, command));
-
-            // demo
-            // const line = document.lineAt(document.positionAt(112).line);
-            // // const indexOf = line.text.indexOf(matches[0]);
-            // const regex = new RegExp(this.regex);
-            // console.log(new RegExp(regex));
-            // const position = new vscode.Position(9, 1);
-            // const range = document.getWordRangeAtPosition(position, new RegExp(this.regex));
-            // if (range) {
-            //     this.codeLenses.push(new vscode.CodeLens(range));
-            // }
-
-            // const regex = new RegExp(this.regex);
-            // const text = document.getText();
-            // let matches;
-            // while ((matches = regex.exec(text)) !== null) {
-            //     const line = document.lineAt(document.positionAt(matches.index).line);
-            //     console.log(line);
-            //     const indexOf = line.text.indexOf(matches[0]);
-            //     console.log(indexOf);
-            //     const position = new vscode.Position(line.lineNumber, indexOf);
-            //     console.log(position);
-            //     const range = document.getWordRangeAtPosition(position, new RegExp(this.regex));
-            //     console.log(range);
-            //     if (range) {
-            //         this.codeLenses.push(new vscode.CodeLens(range));
-            //     }
-            // }
-            // return this.codeLenses;
+            return this.codeLenses;
         }
         return [];
     }
 
     public resolveCodeLens(codeLens: vscode.CodeLens, token: vscode.CancellationToken) {
-        console.log(codeLens);
-        if (vscode.workspace.getConfiguration("stenography").get("enableCodeLens", true)) {
+        if (vscode.workspace.getConfiguration("stenography.autopilotSettings").get("codeLensMode", true)) {
+            console.log('active');
             codeLens.command = {
                 title: '<stenography autopilot />',
                 tooltip: `The command will be called "stenography.autopilot" and it will call the logic function with false as an argument.\n
