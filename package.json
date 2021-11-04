@@ -21,8 +21,7 @@
   ],
   "activationEvents": [
     "onCommand:stenography.autopilot",
-    "onCommand:stenography.enableCodeLens",
-    "onCommand:stenography.disableCodeLens",
+    "onCommand:stenography.toggleCodeLens",
     "onCommand:stenography.autopilot-dryrun",
     "onCommand:stenography.setKey"
   ],
@@ -42,13 +41,9 @@
         "title": "Stenography Autopilot - Dry Run"
       },
       {
-        "title": "Stenography - Enable CodeLens [ALPHA]",
-        "command": "stenography.enableCodeLens"
-    },
-    {
-        "title": "Stenography - Disable Codelens [ALPHA]",
-        "command": "stenography.disableCodeLens"
-    }
+        "command": "stenography.toggleCodeLens",
+        "title": "Toggle Stenography Code Lens"
+      }
     ],
     "configuration": [
       {

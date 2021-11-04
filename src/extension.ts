@@ -265,34 +265,20 @@ This means that we are not running dry, so we want to actually run stenography o
        */
 export function activate(context: vscode.ExtensionContext) {
 	console.log('Congratulations, your extension "stenography" is now active!');
-
+	// console.log(vscode.workspace.getConfiguration().get('stenography.autopilotSettings.codeLens'));
 	const codelensProvider = new CodelensProvider();
 
     vscode.languages.registerCodeLensProvider("*", codelensProvider);
 
 
-    const enableDispose =  vscode.commands.registerCommand("stenography.enableCodeLens", () => {
-		console.log("Enabling code lenses");
-		console.log(vscode.workspace.getConfiguration("stenography.autopilotSettings").get("codeLensMode"));
-        vscode.workspace.getConfiguration("stenography.autopilotSettings").update("codeLensMode", true, true);
-		console.log("Code lenses enabled?");
-		console.log(vscode.workspace.getConfiguration("stenography.autopilotSettings"));
-		vscode.workspace.getConfiguration().get('stenography.autopilotSettings.codeLensMode');
-		console.log(vscode.workspace.getConfiguration("stenography.autopilotSettings").get("codeLensMode", false));
-		
-		
-
-    });
-
-    const disableDispose = vscode.commands.registerCommand("stenography.disableCodeLens", () => {
-		console.log("disableCodeLens");
-        vscode.workspace.getConfiguration("stenography").update("autopilotSettings.codeLensMode", false, false);
-    });
-
     vscode.commands.registerCommand("stenography.codelensAction", (args: any) => {
         vscode.window.showInformationMessage(args);
     });
 
+	let toggleCodeLens = vscode.commands.registerCommand('stenography.toggleCodeLens', () => {
+		// vscode.workspace.getConfiguration().update('stenography.autopilotSettings.codeLens', !vscode.workspace.getConfiguration().get('stenography.autopilotSettings.codeLens'), true);
+		vscode.window.showInformationMessage(`registerCodeLensProvider [EXPERIMENTAL]. (looking at settings value) will load momentarily!!`);
+	});
 
 	let setKeyDisposable = vscode.commands.registerCommand('stenography.setKey', async () => {
 		await showInputBox();
@@ -312,8 +298,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(disposableDryRun);
 	context.subscriptions.push(disposable);
 	context.subscriptions.push(setKeyDisposable);
-	context.subscriptions.push(enableDispose);
-	context.subscriptions.push(disableDispose);
+	context.subscriptions.push(toggleCodeLens);
 }
 
 // this method is called when your extension is deactivated

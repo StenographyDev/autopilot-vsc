@@ -68,6 +68,7 @@ export class CodelensProvider implements vscode.CodeLensProvider {
     codeLensesCache:any = {};
 
     public provideCodeLenses(document: vscode.TextDocument, token: vscode.CancellationToken): vscode.CodeLens[] | Thenable<vscode.CodeLens[]> {
+        console.log('provideCodeLenses');
         console.log(vscode.workspace.getConfiguration("stenography.autopilotSettings").get("codeLensMode", true));
 
         if (vscode.workspace.getConfiguration("stenography.autopilotSettings").get("codeLensMode", false)) {
