@@ -24,7 +24,7 @@ New languages are continously being added! [Follow Stenography on Twitter](https
 1. On a valid file, hit `ctrl(windows)/cmd(mac) + shift + p` and run `Stenography Autopilot - Dry Run` to see where the AI will comment your code. This **won't** cost any API invocations.
 2. Remove dry run comments by hitting **undo twice (see Known Issues below)**
 3. Run Stenography! `ctrl(windows)/cmd(mac) + shift + p` and run `Stenography Autopilot`. This **will** cost API invocations.
-4. To select all comments Stenography generated, use this regex pattern: `(\/\*)(.|\n)+?(\]\s*\n\s*\*\/)`
+4. To select all comments Stenography generated, use this regex pattern: `(\/\*\n{1})(.|\n)+?(\]\s*\n\s*\*\/)`
 
 <img width="839" alt="Screen Shot 2021-11-05 at 11 47 59 AM" src="https://user-images.githubusercontent.com/3282661/140539043-c01c3000-2476-47b7-a929-f9d1b297d23c.png">
 
