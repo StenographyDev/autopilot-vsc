@@ -7,6 +7,7 @@ Leverage the [Stenography Autopilot API](https://bramses.notion.site/bramses/Ste
 Current language support:
 - Javascript
 - Typescript
+- TSX
 - Python
 - HTML
 - Ruby
