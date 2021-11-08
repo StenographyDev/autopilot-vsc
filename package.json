@@ -12,7 +12,7 @@
     "url": "https://github.com/StenographyDev/autopilot-vsc"
   },
   "description": "Document entire code files. At the click of a button.",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "engines": {
     "vscode": "^1.61.0"
   },

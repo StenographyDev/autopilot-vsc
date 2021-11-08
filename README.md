@@ -9,6 +9,7 @@ Current language support:
 - Typescript
 - Python
 - HTML
+- Ruby
 
 New languages are continously being added! [Follow Stenography on Twitter](https://twitter.com/StenographyDev) to be kept up to date about new languages. 
 
@@ -71,3 +72,7 @@ Initial release of Stenography Extension!
 - Added `Stenography API Key command`
 - Added **[experimental]** code lens mode
 - Adjusted comment blocks so that all start lines line up
+
+### 1.0.4
+
+- Added support for Ruby
