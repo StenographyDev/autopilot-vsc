@@ -6,7 +6,8 @@ const FILETYPES:any = {
 	"tsx": "tsx",
 	"js": "javascript",
 	"py": "python",
-	"html": "html"
+	"html": "html",
+    "rb": "ruby",
 };
 
 const STENOGRAPHY_API_KEY = vscode.workspace.getConfiguration().get('stenography.apiKey')

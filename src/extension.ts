@@ -108,7 +108,8 @@ const FILETYPES:any = {
 	"tsx": "tsx",
 	"js": "javascript",
 	"py": "python",
-	"html": "html"
+	"html": "html",
+	"rb": "ruby",
 };
 
 const logic = async (editor: vscode.TextEditor | undefined, isDryRun = true) => {
@@ -240,6 +241,7 @@ const logic = async (editor: vscode.TextEditor | undefined, isDryRun = true) => 
 								});
 							});
 							break;
+						case 'ruby':
 						case 'python':
                     /*
                     This code is adding a new line character to the end of each line in linesA.
