@@ -76,3 +76,7 @@ Initial release of Stenography Extension!
 ### 1.0.4
 
 - Added support for Ruby
+
+## 1.0.41
+
+- Ruby and Python single quote fix

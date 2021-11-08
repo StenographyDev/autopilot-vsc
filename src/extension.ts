@@ -254,7 +254,7 @@ const logic = async (editor: vscode.TextEditor | undefined, isDryRun = true) => 
 							}).then(() => {
 								editor?.edit(edit => {
 									linesA.forEach((line:any, idx:number) => {
-										edit.insert(new vscode.Position(line.line.line + idx, line.line.character), `${' '.repeat(line.line.character)}'''\n${' '.repeat(line.line.character)}${line.codeRes.replace('\'\'\'', '').split('\n').map((ln:string , idx:number) => {
+										edit.insert(new vscode.Position(line.line.line + idx, line.line.character), `${' '.repeat(line.line.character)}'''\n${' '.repeat(line.line.character)}${line.codeRes.replace('\'\'\'', '').replaceAll("\'", "\\'").split('\n').map((ln:string , idx:number) => {
 											if (idx === 0) {
 												return ln;
 											} 
