@@ -21,14 +21,14 @@ async function showInputBox() {
 
 	try {
 		if (result) {
-			setStenographyAPIKey(result)
+			setStenographyAPIKey(result);
 			vscode.window.showInformationMessage("API Key successfully added to stenography session!");
 		} else {
-			throw new Error('result is undefined')
+			throw new Error('result is undefined');
 		}
 	} catch (error) {
-		console.error("Invalid key") // todo some 401 magic from actual outbound call
-		return "Invalid Key"
+		console.error("Invalid key"); // todo some 401 magic from actual outbound call
+		return "Invalid Key";
 	}
 }
 
@@ -49,10 +49,8 @@ interface StenographyResponse {
 }
 
 interface AutopilotResponse {
-	// eslint-disable-next-line @typescript-eslint/naming-convention
 	invocation_counter: number,
-	// eslint-disable-next-line @typescript-eslint/naming-convention
-	code_blocks?: [CodeBlock]
+	code_blocks?: [CodeBlock],
 	error?: any
 }
 

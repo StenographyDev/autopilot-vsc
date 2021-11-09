@@ -1,65 +1,15 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import * as vscode from 'vscode';
-import fetch from 'node-fetch';
-
-const FILETYPES:any = {
-	"ts": "typescript",
-	"tsx": "tsx",
-	"js": "javascript",
-	"py": "python",
-	"html": "html",
-    "rb": "ruby",
-};
-
-const STENOGRAPHY_API_KEY = vscode.workspace.getConfiguration().get('stenography.apiKey')
-
-const fetchStenographyAutopilot = async (code: string, language: string, dryRun: boolean = true): Promise<any> => {
-
-	let fetchUrl = 'https://stenography-worker.stenography.workers.dev/autopilot';
-
-	let options = {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ 
-			"code": code, 
-			"api_key": STENOGRAPHY_API_KEY, 
-			"dry_run": dryRun, 
-			"index_by_one": true, 
-			"add_import": false, 
-			"language": language, 
-			"stenography_options": { 
-				"audience": "pm",
-				"stackoverflow": false,
-				"populate": false
-			} 
-		})
-	};
-
-	try {
-		const resp = await fetch(fetchUrl, options);
-
-		const json: any = await resp.json();
-		if (typeof json === 'string') {
-			throw new Error(json);
-		}
-		return json;
-	} catch (err: any) {
-		console.error(err);
-	}
-};
-
-/**
- * CodelensProvider
- */
+import { FILETYPES, fetchStenographyAutopilot } from './utils';
+ 
 export class CodelensProvider implements vscode.CodeLensProvider {
 
+    
     private codeLenses: vscode.CodeLens[] = [];
-    private regex: RegExp;
     private _onDidChangeCodeLenses: vscode.EventEmitter<void> = new vscode.EventEmitter<void>();
     public readonly onDidChangeCodeLenses: vscode.Event<void> = this._onDidChangeCodeLenses.event;
 
     constructor() {
-        this.regex = /const/g;
-
         // vscode.workspace.onDidChangeConfiguration((_) => {
         //     this._onDidChangeCodeLenses.fire();
         // });
@@ -69,57 +19,71 @@ export class CodelensProvider implements vscode.CodeLensProvider {
     codeLensesCache:any = {};
 
     public provideCodeLenses(document: vscode.TextDocument, token: vscode.CancellationToken): vscode.CodeLens[] | Thenable<vscode.CodeLens[]> {
+        const STENOGRAPHY_API_KEY: string|undefined = vscode.workspace.getConfiguration().get('stenography.apiKey');
         console.log('provideCodeLenses');
-        console.log(vscode.workspace.getConfiguration("stenography.autopilotSettings").get("codeLensMode", true));
 
         if (vscode.workspace.getConfiguration("stenography.autopilotSettings").get("codeLensMode", false)) {
-            const filename:string = document.fileName;
-            console.log(filename);
-            const fullFileName: string[] | undefined = document.fileName.split('.');
-            const fileType: string | undefined = fullFileName.slice(-1)[0];
-            let language = FILETYPES[fileType];
-
-            this.codeLenses = [];
-            if (filename in this.codeLensesCache) {
-                this.codeLenses = this.codeLensesCache[filename];
-                return this.codeLenses;
-            }
             
-            if (filename in this.documentsCache) {
-                console.log("Already in cache");
-                if (document.getText() !== this.documentsCache[filename]) {
-                    console.log("Text changed");
-                }
-            } else {
-                this.documentsCache[filename] = document.getText();
-                console.log("Added to cache");
-                return fetchStenographyAutopilot(document.getText(), language, false).then((data: any) => {
-                    console.log(data);
-                    if (data.error) {
-                        console.error(data.error);
-                        return [];
-                    }
-                    data.code_blocks.forEach((block: any) => {
+            return vscode.window.withProgress({
+                location: vscode.ProgressLocation.Window,
+                cancellable: false,
+                title: 'Fetching from Stenography Autopilot'
+            }, async (progress) => {
+                progress.report({ increment: 0 });
+            
+                const filename:string = document.fileName;
+                console.log(filename);
+                const fullFileName: string[] | undefined = document.fileName.split('.');
+                const fileType: string | undefined = fullFileName.slice(-1)[0];
+                let language = FILETYPES[fileType];
 
-                        var firstLine = document.lineAt(block.startPosition.row - 1);
-                        var textRange = new vscode.Range(firstLine.range.start, firstLine.range.end);
-                        let command = {
-                            title : "<stenography autopilot />",
-                            tooltip: block.stenographyResult.pm,
-                            command: "stenography.codelensAction",
-                            arguments: [block.stenographyResult.pm]
-                        };
-                        this.codeLenses.push(new vscode.CodeLens(textRange, command));
-                        this.codeLensesCache[filename] = this.codeLenses;
-                    });
-
-                    console.log(this.codeLenses);
+                this.codeLenses = [];
+                if (filename in this.codeLensesCache) {
+                    this.codeLenses = this.codeLensesCache[filename].codeLenses;
                     return this.codeLenses;
-                });
-            }
+                }
+                
+                if (filename in this.documentsCache) {
+                    console.log("Already in cache");
+                    if (document.getText() !== this.documentsCache[filename]) {
+                        console.log("Text changed");
+                    }
+                } else {
+                    this.documentsCache[filename] = document.getText();
+                    console.log("Added to cache");
+                    return fetchStenographyAutopilot(STENOGRAPHY_API_KEY!, document.getText(), language, false).then((data: any) => {
+                        console.log(data);
+                        if (data.error) {
+                            console.error(data.error);
+                            return [];
+                        }
+                        data.code_blocks.forEach((block: any) => {
 
-            return this.codeLenses;
+                            var firstLine = document.lineAt(block.startPosition.row - 1);
+                            const firstLineText = document.lineAt(block.startPosition.row).text;
+                            var textRange = new vscode.Range(firstLine.range.start, firstLine.range.end);
+                            let command = {
+                                title : "<stenography autopilot />",
+                                tooltip: block.stenographyResult.pm,
+                                command: "stenography.codelensAction",
+                                arguments: [block.stenographyResult.pm]
+                            };
+                            this.codeLenses.push(new vscode.CodeLens(textRange, command));
+                            this.codeLensesCache[filename] = {
+                                codeLenses: this.codeLenses,
+                                boundTo: firstLineText
+                            };
+                        });
+
+                        console.log(this.codeLenses);
+                        return this.codeLenses;
+                    });
+                }
+                
+                return this.codeLenses;
+            });
         }
+            
         return [];
     }
 
