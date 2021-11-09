@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import * as vscode from 'vscode';
-import { FILETYPES, fetchStenographyAutopilot } from './utils';
+import { FILETYPES, fetchStenographyAutopilot, escapeRegExp } from './utils';
  
 export class CodelensProvider implements vscode.CodeLensProvider {
 
@@ -10,9 +10,12 @@ export class CodelensProvider implements vscode.CodeLensProvider {
     public readonly onDidChangeCodeLenses: vscode.Event<void> = this._onDidChangeCodeLenses.event;
 
     constructor() {
-        // vscode.workspace.onDidChangeConfiguration((_) => {
-        //     this._onDidChangeCodeLenses.fire();
-        // });
+        // NEW STRAT: on save, run autopilot on the document
+        // for every other document change check if code block has changed, if so remove codelens
+        // else just change its line with the document text
+        vscode.workspace.onDidChangeConfiguration((_) => {
+            this._onDidChangeCodeLenses.fire();
+        });
     }
 
     documentsCache:any = {};
@@ -37,9 +40,33 @@ export class CodelensProvider implements vscode.CodeLensProvider {
                 const fileType: string | undefined = fullFileName.slice(-1)[0];
                 let language = FILETYPES[fileType];
 
+                const codeLenses: vscode.CodeLens[] = [];
                 this.codeLenses = [];
+
                 if (filename in this.codeLensesCache) {
-                    this.codeLenses = this.codeLensesCache[filename].codeLenses;
+                    console.log('cache hit');
+                    for (let i = 0; i < this.codeLensesCache[filename].length; i++) {
+                        const codeLensWrapper = [];
+                        const codeLensObj = this.codeLensesCache[filename][i];
+                        const regex = new RegExp(escapeRegExp(codeLensObj.boundTo), 'g');
+                    
+                        const text = document.getText();
+                        let matches;
+                        while ((matches = regex.exec(text)) !== null) {
+                            const line = document.lineAt(document.positionAt(matches.index).line);
+                            const textRange = new vscode.Range(line.range.start, line.range.end);
+
+                            if (textRange) {
+                                console.log('adding codelens w command');
+                                // console.log(new vscode.CodeLens(textRange, codeLensObj.command));
+                                codeLensWrapper.push(new vscode.CodeLens(textRange, codeLensObj.command));
+                            }
+                        }
+                        this.codeLenses.push(...codeLensWrapper);
+                        console.log(codeLenses);
+                    }
+                    
+                    console.log(codeLenses);
                     return this.codeLenses;
                 }
                 
@@ -51,16 +78,20 @@ export class CodelensProvider implements vscode.CodeLensProvider {
                 } else {
                     this.documentsCache[filename] = document.getText();
                     console.log("Added to cache");
+
+                    // use dry run call to see if code changed enough to justify a run
+                    // how many code blocks changed
+                    // in future, a smart autopilot will be able to detect changes in the code and run only if there are enough changes
+
                     return fetchStenographyAutopilot(STENOGRAPHY_API_KEY!, document.getText(), language, false).then((data: any) => {
                         console.log(data);
+                        this.codeLensesCache[filename] = [];
                         if (data.error) {
                             console.error(data.error);
                             return [];
                         }
                         data.code_blocks.forEach((block: any) => {
-
                             var firstLine = document.lineAt(block.startPosition.row - 1);
-                            const firstLineText = document.lineAt(block.startPosition.row).text;
                             var textRange = new vscode.Range(firstLine.range.start, firstLine.range.end);
                             let command = {
                                 title : "<stenography autopilot />",
@@ -69,13 +100,12 @@ export class CodelensProvider implements vscode.CodeLensProvider {
                                 arguments: [block.stenographyResult.pm]
                             };
                             this.codeLenses.push(new vscode.CodeLens(textRange, command));
-                            this.codeLensesCache[filename] = {
-                                codeLenses: this.codeLenses,
-                                boundTo: firstLineText
-                            };
+                            this.codeLensesCache[filename].push({
+                                boundTo: block.stenographyResult.code,
+                                command: command
+                            });
                         });
 
-                        console.log(this.codeLenses);
                         return this.codeLenses;
                     });
                 }
