@@ -9,17 +9,28 @@ export class CodelensProvider implements vscode.CodeLensProvider {
     private _onDidChangeCodeLenses: vscode.EventEmitter<void> = new vscode.EventEmitter<void>();
     public readonly onDidChangeCodeLenses: vscode.Event<void> = this._onDidChangeCodeLenses.event;
 
+    documentsCache:any = {};
+    codeLensesCache:any = {};
+
     constructor() {
+        console.log('codelens provider constructor');
         // NEW STRAT: on save, run autopilot on the document
         // for every other document change check if code block has changed, if so remove codelens
         // else just change its line with the document text
         vscode.workspace.onDidChangeConfiguration((_) => {
+            console.log('onDidChangeConfiguration');
+            this._onDidChangeCodeLenses.fire();
+        });
+
+        vscode.workspace.onDidSaveTextDocument((document) => {
+            console.log('onDidSaveTextDocument + ' + document.fileName);
+            this.codeLensesCache[document.fileName] = null;
+            this.documentsCache[document.fileName] = null;
             this._onDidChangeCodeLenses.fire();
         });
     }
 
-    documentsCache:any = {};
-    codeLensesCache:any = {};
+    
 
     public provideCodeLenses(document: vscode.TextDocument, token: vscode.CancellationToken): vscode.CodeLens[] | Thenable<vscode.CodeLens[]> {
         const STENOGRAPHY_API_KEY: string|undefined = vscode.workspace.getConfiguration().get('stenography.apiKey');
@@ -35,7 +46,6 @@ export class CodelensProvider implements vscode.CodeLensProvider {
                 progress.report({ increment: 0 });
             
                 const filename:string = document.fileName;
-                console.log(filename);
                 const fullFileName: string[] | undefined = document.fileName.split('.');
                 const fileType: string | undefined = fullFileName.slice(-1)[0];
                 let language = FILETYPES[fileType];
@@ -43,7 +53,7 @@ export class CodelensProvider implements vscode.CodeLensProvider {
                 const codeLenses: vscode.CodeLens[] = [];
                 this.codeLenses = [];
 
-                if (filename in this.codeLensesCache) {
+                if (filename in this.codeLensesCache && this.codeLensesCache[filename] !== null) {
                     console.log('cache hit');
                     for (let i = 0; i < this.codeLensesCache[filename].length; i++) {
                         const codeLensWrapper = [];
@@ -70,7 +80,7 @@ export class CodelensProvider implements vscode.CodeLensProvider {
                     return this.codeLenses;
                 }
                 
-                if (filename in this.documentsCache) {
+                if (filename in this.documentsCache && this.documentsCache[filename] !== null) {
                     console.log("Already in cache");
                     if (document.getText() !== this.documentsCache[filename]) {
                         console.log("Text changed");
