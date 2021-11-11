@@ -1,4 +1,5 @@
 import fetch from 'node-fetch';
+import * as vscode from 'vscode';
 /* eslint-disable @typescript-eslint/naming-convention */
 
 export const FILETYPES:any = {
@@ -9,6 +10,8 @@ export const FILETYPES:any = {
 	"html": "html",
     "rb": "ruby",
 };
+
+export const CACHE_NAME = "stenographyCache";
 
 interface StenographyResponse {
 	pm: string,
@@ -26,6 +29,29 @@ interface AutopilotResponse {
 	invocation_counter: number,
 	code_blocks?: [CodeBlock]
 	error?: any
+}
+
+interface DocumentCache {
+	[key: string]: string | null
+}
+
+interface CodeLensCache {
+	[key: string]: {
+		boundTo: string,
+		command: {
+			title: string;
+			tooltip: any;
+			command: string;
+			arguments: any[];
+		}
+	}[] | null
+}
+
+export interface CacheObject {
+	documentCache: DocumentCache,
+	codeLensCache: CodeLensCache,
+	maxedOutInvocations: boolean,
+	lastChecked: Date
 }
 
 export const fetchStenographyAutopilot = async (api_key: string, code: string, language: string, dryRun: boolean = true): Promise<AutopilotResponse> => {
