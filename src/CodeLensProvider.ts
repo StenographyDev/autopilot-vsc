@@ -57,21 +57,31 @@ export class CodelensProvider implements vscode.CodeLensProvider {
         if (this.cache.maxedOutInvocations) {
             console.log('maxed out invocations');
             const newDatetime = new Date().getTime();
-            if (Date.parse(this.cache.lastChecked.toString()) + 1000 * 60 * 60 * 24 < newDatetime) {
+            if (Date.parse(this.cache.lastChecked.toString()) + 1000 * 10 < newDatetime) {
                 console.log('last checked 24 hours ago -- seeing if invocations reset');
-
-                fetchStenographyAutopilot(STENOGRAPHY_API_KEY!, document.getText(), language, true).then((response) => {
-                    if (response.error) {
-                        vscode.window.showErrorMessage(response.error.message);
-                        return;
-                    }
-                    console.log('response: ' + JSON.stringify(response));
-                });
-
-                this.cache.lastChecked = new Date(newDatetime);
-                this.context.workspaceState.update(CACHE_NAME, this.cache); // TODO: does this need to be awaited or is that a nice to have?
+                vscode.window.withProgress({
+                    location: vscode.ProgressLocation.Window,
+                    cancellable: false,
+                    title: 'Checking Stenography Plan'
+                }, async (progress) => {
+                    progress.report({ increment: 0 });
+                    fetchStenographyAutopilot(STENOGRAPHY_API_KEY!, document.getText(), language, true).then((response) => {
+                        if (response.error) {
+                            vscode.window.showErrorMessage(response.error.message);
+                            console.log('response: ' + JSON.stringify(response));
+                            this.cache.lastChecked = new Date(newDatetime);
+                            this.context.workspaceState.update(CACHE_NAME, this.cache); // TODO: does this need to be awaited or is that a nice to have?
+                            return [];
+                        } else {
+                            this.cache.maxedOutInvocations = false;
+                            this.cache.lastChecked = new Date(newDatetime);
+                            this.context.workspaceState.update(CACHE_NAME, this.cache); // TODO: does this need to be awaited or is that a nice to have?
+                        }
+                        progress.report({ increment: 100 });
+                    });
+                    return [];
+                });     
             }
-            return [];
         }
 
 
@@ -114,6 +124,9 @@ export class CodelensProvider implements vscode.CodeLensProvider {
                             let errorMessage = data.error.message;
                             if(errorMessage.includes('Unauthorized POST')) {
                                 errorMessage = 'Please set a valid API key in the settings.\nYou can get an API key here: https://stenography.dev/dashboard. Refer to README for more help!';
+                            }
+                            else if (errorMessage.includes('monthly invocations')) {
+                                // TODO cache update
                             }
     
                             vscode.window.showErrorMessage(errorMessage);

@@ -5,6 +5,7 @@ import * as vscode from 'vscode';
 import fetch from 'node-fetch';
 import { CodelensProvider } from './CodelensProvider';
 import { CacheObject, CACHE_NAME } from './utils'; 
+import * as say from 'say';
 
 let STENOGRAPHY_API_KEY: string | null | undefined;
 
@@ -328,7 +329,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	const defaultData: CacheObject = {
 		documentCache: {},
 		codeLensCache: {},
-		maxedOutInvocations: true,
+		maxedOutInvocations: false,
 		lastChecked: new Date(),
 	};
 	
@@ -365,7 +366,11 @@ export async function activate(context: vscode.ExtensionContext) {
 
 
     vscode.commands.registerCommand("stenography.codelensAction", (args: any) => {
-        vscode.window.showInformationMessage(args);
+        vscode.window.showInformationMessage(args, 'speak').then((value) => {
+			if (value === 'speak') {
+				say.speak(args);
+			}
+		});
     });
 
 	let toggleCodeLens = vscode.commands.registerCommand('stenography.toggleCodeLens', () => {

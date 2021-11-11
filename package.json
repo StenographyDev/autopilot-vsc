@@ -107,6 +107,7 @@
     "webpack-cli": "^4.8.0"
   },
   "dependencies": {
-    "node-fetch": "^3.0.0"
+    "node-fetch": "^3.0.0",
+    "say": "^0.16.0"
   }
 }
