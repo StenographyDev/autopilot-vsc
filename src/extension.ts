@@ -328,7 +328,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	const defaultData: CacheObject = {
 		documentCache: {},
 		codeLensCache: {},
-		maxedOutInvocations: false,
+		maxedOutInvocations: true,
 		lastChecked: new Date(),
 	};
 	

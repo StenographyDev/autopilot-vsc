@@ -34,8 +34,6 @@ export class CodelensProvider implements vscode.CodeLensProvider {
         });
     }
 
-    // 79e0fadd-3e07-41a8-8dc5-65dc6e4bed41
-
     public provideCodeLenses(document: vscode.TextDocument, token: vscode.CancellationToken): vscode.CodeLens[] | Thenable<vscode.CodeLens[]> {
         const STENOGRAPHY_API_KEY: string | null | undefined = vscode.workspace.getConfiguration().get('stenography.apiKey');
 
@@ -62,7 +60,13 @@ export class CodelensProvider implements vscode.CodeLensProvider {
             if (Date.parse(this.cache.lastChecked.toString()) + 1000 * 60 * 60 * 24 < newDatetime) {
                 console.log('last checked 24 hours ago -- seeing if invocations reset');
 
-                fetchStenographyAutopilot(STENOGRAPHY_API_KEY!, document.getText(), language, false)
+                fetchStenographyAutopilot(STENOGRAPHY_API_KEY!, document.getText(), language, true).then((response) => {
+                    if (response.error) {
+                        vscode.window.showErrorMessage(response.error.message);
+                        return;
+                    }
+                    console.log('response: ' + JSON.stringify(response));
+                });
 
                 this.cache.lastChecked = new Date(newDatetime);
                 this.context.workspaceState.update(CACHE_NAME, this.cache); // TODO: does this need to be awaited or is that a nice to have?
@@ -72,7 +76,6 @@ export class CodelensProvider implements vscode.CodeLensProvider {
 
 
 
-        const codeLenses: vscode.CodeLens[] = [];
         this.codeLenses = [];
 
         if (filename in this.cache.codeLensCache && this.cache.codeLensCache[filename] !== null) {
@@ -106,6 +109,17 @@ export class CodelensProvider implements vscode.CodeLensProvider {
                 progress.report({ increment: 0 });
                 return fetchStenographyAutopilot(STENOGRAPHY_API_KEY!, document.getText(), language, false).then((data: any) => {
                     try {
+
+                        if (data.error) {
+                            let errorMessage = data.error.message;
+                            if(errorMessage.includes('Unauthorized POST')) {
+                                errorMessage = 'Please set a valid API key in the settings.\nYou can get an API key here: https://stenography.dev/dashboard. Refer to README for more help!';
+                            }
+    
+                            vscode.window.showErrorMessage(errorMessage);
+                            return [];
+                        }
+
                         console.log(data);
                         this.cache.codeLensCache[filename] = [];
                         if (data.error) {
@@ -135,6 +149,10 @@ export class CodelensProvider implements vscode.CodeLensProvider {
                         vscode.window.showErrorMessage(err);
                         return [];
                     }
+                }).catch((err: any) => {
+                    console.error(err.error);
+                    vscode.window.showErrorMessage(err.error);
+                    return [];
                 });
             });
         }
