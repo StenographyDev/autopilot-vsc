@@ -131,7 +131,7 @@ export class CodelensProvider implements vscode.CodeLensProvider {
                                     let errorMessage = data.error.message;
                                     if(errorMessage.includes('Unauthorized POST')) {
                                         errorMessage = 'Please set a valid API key in the settings.\nYou can get an API key here: https://stenography.dev/dashboard. Refer to README for more help!';
-                                        vscode.window.showErrorMessage(errorMessage, 'Input API Key').then(async (value) => {
+                                        vscode.window.showErrorMessage(errorMessage, 'Input API Key', 'Get New API Key').then(async (value) => {
                                             if (value === 'Input API Key') {
                                                 showInputBox().then((apiKey) => {
                                                     if (apiKey) {
@@ -141,6 +141,11 @@ export class CodelensProvider implements vscode.CodeLensProvider {
                                                     vscode.window.showErrorMessage(`Stenography Autopilot: err: ${err}`);
                                                 });
                                             }
+
+                                            if (value === 'Get New API Key') {
+                                                vscode.env.openExternal(vscode.Uri.parse('https://stenography.dev/dashboard'));
+                                            }
+                                                
                                         });
                                     }
                                     else if (errorMessage.includes('monthly limit')) {

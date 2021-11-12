@@ -185,7 +185,7 @@ const logic = async (editor: vscode.TextEditor | undefined, isDryRun = true) => 
 							errorMessage = 'Please set a valid API key.\nYou can get an API key here: https://stenography.dev/dashboard. Refer to README for more help!';
 						}
 
-						vscode.window.showErrorMessage(errorMessage, 'Input API Key').then(async (value) => {
+						vscode.window.showErrorMessage(errorMessage, 'Input API Key', 'Get New API Key').then(async (value) => {
 							if (value === 'Input API Key') {
 								showInputBox().then((apiKey) => {
 									if (apiKey) {
@@ -194,6 +194,9 @@ const logic = async (editor: vscode.TextEditor | undefined, isDryRun = true) => 
 								}).catch((err) => {
 									vscode.window.showErrorMessage(`Stenography Autopilot: err: ${err}`);
 								});
+							}
+							if (value === 'Get New API Key') {
+								vscode.env.openExternal(vscode.Uri.parse('https://stenography.dev/dashboard'));
 							}
 						});
 						return;
@@ -350,7 +353,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	STENOGRAPHY_API_KEY = vscode.workspace.getConfiguration().get('stenography.apiKey');
 
 	if (STENOGRAPHY_API_KEY === undefined || STENOGRAPHY_API_KEY === null || STENOGRAPHY_API_KEY === '') {
-		vscode.window.showErrorMessage('Stenography Autopilot: Please provide an API key!', 'Input API Key').then(async (value) => {
+		vscode.window.showErrorMessage('Stenography Autopilot: Please provide an API key!', 'Input API Key', 'Get New API Key').then(async (value) => {
 			if (value === 'Input API Key') {
 				showInputBox().then((apiKey) => {
 					if (apiKey) {
@@ -361,6 +364,9 @@ export async function activate(context: vscode.ExtensionContext) {
 				}).catch((err) => {
 					vscode.window.showErrorMessage(`Stenography Autopilot: err: ${err}`);
 				});
+			}
+			if (value === 'Get New API Key') {
+				vscode.env.openExternal(vscode.Uri.parse('https://stenography.dev/dashboard'));
 			}
 		});  
 	}
