@@ -11,8 +11,8 @@
     "type": "git",
     "url": "https://github.com/StenographyDev/autopilot-vsc"
   },
-  "description": "Document entire code files. At the click of a button.",
-  "version": "1.0.41",
+  "description": "Document entire code files. Automatically.",
+  "version": "1.1.0",
   "engines": {
     "vscode": "^1.61.0"
   },
@@ -23,7 +23,8 @@
     "onCommand:stenography.autopilot",
     "onCommand:stenography.toggleCodeLens",
     "onCommand:stenography.autopilot-dryrun",
-    "onCommand:stenography.setKey"
+    "onCommand:stenography.setKey",
+    "*"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -58,17 +59,17 @@
               "zeroCol": {
                 "type": "boolean",
                 "description": "Place comments at column zero or at the start of the explanation character"
-              },
-              "codeLensMode": {
-                "type": "boolean",
-                "description": "Enable CodeLens mode [EXPERIMENTAL]. Will call on files and use invocations automatically! Proceed with caution!"
               }
             },
             "additionalProperties": false,
             "default": {
-              "zeroCol": false,
-              "codeLensMode": false
+              "zeroCol": false
             }
+          },
+          "stenography.codeLensMode": {
+            "type": "boolean",
+            "default": true,
+            "description": "Enable CodeLens mode."
           },
           "stenography.apiKey": {
             "type": "string",

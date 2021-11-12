@@ -85,6 +85,7 @@ export const fetchStenographyAutopilot = async (api_key: string, code: string, l
 		if (typeof json === 'string') {
 			throw new Error(json);
 		}
+		console.log(`Autopilot response: ${JSON.stringify(json)}`);
 		return json;
 	} catch (err: any) {
 		console.error(err);

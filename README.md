@@ -23,6 +23,13 @@ New languages are continously being added! [Follow Stenography on Twitter](https
 
 ## Running
 
+### CodeLens Mode
+
+CodeLens Mode should run automatically, but can be turned on and off with `Toggle Stenography Code Lens` command
+
+
+### Comment Mode
+
 1. On a valid file, hit `ctrl(windows)/cmd(mac) + shift + p` and run `Stenography Autopilot - Dry Run` to see where the AI will comment your code. This **won't** cost any API invocations.
 2. Remove dry run comments by hitting **undo twice (see Known Issues below)**
 3. Run Stenography! `ctrl(windows)/cmd(mac) + shift + p` and run `Stenography Autopilot`. This **will** cost API invocations.
@@ -81,3 +88,8 @@ Initial release of Stenography Extension!
 ### 1.0.41
 
 - Ruby and Python single quote fix
+
+### 1.1.0
+
+- Codelens mode is live! Runs on new file and file save. Can be toggled with `Toggle Stenography Code Lens`
+- Click on CodeLens to see result, and press the `speak` button to have Stenography describe function to you

@@ -117,18 +117,18 @@ const FILETYPES:any = {
 
 const logic = async (editor: vscode.TextEditor | undefined, isDryRun = true) => {
 	try {
-		// if (vscode.workspace.getConfiguration().get('stenography.apiKey')) {
-		// 	STENOGRAPHY_API_KEY = vscode.workspace.getConfiguration().get('stenography.apiKey');
-		// } else {
-		// 	if (!STENOGRAPHY_API_KEY) {
-		// 		const result = await showInputBox();
-		// 		if (result) {
-		// 			setStenographyAPIKey(result);
-		// 		} else {
-		// 			return;
-		// 		}
-		// 	}
-		// }
+		if (vscode.workspace.getConfiguration().get('stenography.apiKey')) {
+			STENOGRAPHY_API_KEY = vscode.workspace.getConfiguration().get('stenography.apiKey');
+		} else {
+			if (!STENOGRAPHY_API_KEY) {
+				const result = await showInputBox();
+				if (result) {
+					setStenographyAPIKey(result);
+				} else {
+					return;
+				}
+			}
+		}
 		
 		let ZERO_COLUMN = vscode.workspace.getConfiguration().get('stenography.autopilotSettings.zeroCol');
 
@@ -182,10 +182,20 @@ const logic = async (editor: vscode.TextEditor | undefined, isDryRun = true) => 
 					if (res.error) {
 						let errorMessage = res.error.message;
 						if(errorMessage.includes('Unauthorized POST')) {
-							errorMessage = 'Please set a valid API key in the settings.\nYou can get an API key here: https://stenography.dev/dashboard. Refer to README for more help!';
+							errorMessage = 'Please set a valid API key.\nYou can get an API key here: https://stenography.dev/dashboard. Refer to README for more help!';
 						}
 
-						vscode.window.showErrorMessage(errorMessage);
+						vscode.window.showErrorMessage(errorMessage, 'Input API Key').then(async (value) => {
+							if (value === 'Input API Key') {
+								showInputBox().then((apiKey) => {
+									if (apiKey) {
+										setStenographyAPIKey(apiKey);
+									}
+								}).catch((err) => {
+									vscode.window.showErrorMessage(`Stenography Autopilot: err: ${err}`);
+								});
+							}
+						});
 						return;
 					}
 	
@@ -335,11 +345,10 @@ export async function activate(context: vscode.ExtensionContext) {
 	
 	const cache = context.workspaceState.get<CacheObject>(CACHE_NAME, defaultData);
 	await context.workspaceState.update(CACHE_NAME, defaultData);
-	console.log('cache act: ' + JSON.stringify(cache));
+	console.log('cache: ' + JSON.stringify(cache));
 
 	STENOGRAPHY_API_KEY = vscode.workspace.getConfiguration().get('stenography.apiKey');
 
-	console.log('STENOGRAPHY_API_KEY: ' + STENOGRAPHY_API_KEY);
 	if (STENOGRAPHY_API_KEY === undefined || STENOGRAPHY_API_KEY === null || STENOGRAPHY_API_KEY === '') {
 		vscode.window.showErrorMessage('Stenography Autopilot: Please provide an API key!', 'Input API Key').then(async (value) => {
 			if (value === 'Input API Key') {
@@ -356,10 +365,6 @@ export async function activate(context: vscode.ExtensionContext) {
 		});  
 	}
 
-
-	// console.log(vscode.workspace.getConfiguration().get('stenography.autopilotSettings.codeLens'));
-
-
 	const codelensProvider = new CodelensProvider(context, cache);
 
     vscode.languages.registerCodeLensProvider("*", codelensProvider);
@@ -373,9 +378,9 @@ export async function activate(context: vscode.ExtensionContext) {
 		});
     });
 
-	let toggleCodeLens = vscode.commands.registerCommand('stenography.toggleCodeLens', () => {
-		// vscode.workspace.getConfiguration().update('stenography.autopilotSettings.codeLens', !vscode.workspace.getConfiguration().get('stenography.autopilotSettings.codeLens'), true);
-		vscode.window.showInformationMessage(`registerCodeLensProvider [EXPERIMENTAL]. (looking at settings value) will load momentarily!!`);
+	let toggleCodeLens = vscode.commands.registerCommand('stenography.toggleCodeLens', async () => {
+		await vscode.workspace.getConfiguration().update('stenography.codeLensMode', !vscode.workspace.getConfiguration().get('stenography.codeLensMode'), true);
+		vscode.window.showInformationMessage(`CodeLens mode is now ${vscode.workspace.getConfiguration().get('stenography.codeLensMode') ? 'active': 'inactive'}`);
 	});
 
 	let setKeyDisposable = vscode.commands.registerCommand('stenography.setKey', async () => {
