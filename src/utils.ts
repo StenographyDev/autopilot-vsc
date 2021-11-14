@@ -94,5 +94,8 @@ export const fetchStenographyAutopilot = async (api_key: string, code: string, l
 };
 
 export function escapeRegExp(text: string) {
-    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+    if (text) {
+		return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+	}
+	return text;
 }

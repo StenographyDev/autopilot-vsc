@@ -12,7 +12,7 @@
     "url": "https://github.com/StenographyDev/autopilot-vsc"
   },
   "description": "Document entire code files. Automatically.",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "engines": {
     "vscode": "^1.61.0"
   },
@@ -24,6 +24,7 @@
     "onCommand:stenography.toggleCodeLens",
     "onCommand:stenography.autopilot-dryrun",
     "onCommand:stenography.setKey",
+    "onCommand:stenography.resetCache",
     "*"
   ],
   "main": "./dist/extension.js",
@@ -44,6 +45,10 @@
       {
         "command": "stenography.toggleCodeLens",
         "title": "Toggle Stenography Code Lens"
+      },
+      {
+        "command": "stenography.resetCache",
+        "title": "Reset Stenography Cache"
       }
     ],
     "configuration": [

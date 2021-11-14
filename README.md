@@ -93,3 +93,8 @@ Initial release of Stenography Extension!
 
 - Codelens mode is live! Runs on new file and file save. Can be toggled with `Toggle Stenography Code Lens`
 - Click on CodeLens to see result, and press the `speak` button to have Stenography describe function to you
+
+### 1.1.1
+
+- Fixed bug where cache gets stuck on max invocations. Can be cleared by toggling Codelens off and on again.
+- Fixed escape regex bug when text was null

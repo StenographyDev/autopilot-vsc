@@ -389,6 +389,11 @@ export async function activate(context: vscode.ExtensionContext) {
 		vscode.window.showInformationMessage(`CodeLens mode is now ${vscode.workspace.getConfiguration().get('stenography.codeLensMode') ? 'active': 'inactive'}`);
 	});
 
+	let resetCache = vscode.commands.registerCommand('stenography.resetCache', async () => {
+		await context.workspaceState.update(CACHE_NAME, defaultData);
+		vscode.window.showInformationMessage('Cache reset');
+	});
+
 	let setKeyDisposable = vscode.commands.registerCommand('stenography.setKey', async () => {
 		await showInputBox();
 	});
@@ -408,6 +413,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(disposable);
 	context.subscriptions.push(setKeyDisposable);
 	context.subscriptions.push(toggleCodeLens);
+	context.subscriptions.push(resetCache);
 }
 
 // this method is called when your extension is deactivated
