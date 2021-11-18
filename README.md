@@ -27,6 +27,14 @@ New languages are continously being added! [Follow Stenography on Twitter](https
 
 CodeLens Mode should run automatically, but can be turned on and off with `Toggle Stenography Code Lens` command
 
+![steno-js-autopilot-ex.png,-2021-11-18T18](https://imagedelivery.net/FVn4Kw8Yr8auy8XS7UL4RA/0583638d-2589-4036-5aa8-d26d126b9600/public)
+
+![steno-autopilot-arrow.png,-2021-11-18T18](https://imagedelivery.net/FVn4Kw8Yr8auy8XS7UL4RA/19a7c233-5db1-4e61-6f5f-524c64e96600/public)
+
+These small gray lines with the text `<stenography autopilot />` will populate your code on the CodeLens layer. These CodeLenses will auto update whenever you save the document.
+They will also save to a cache if the code hasn't changed allowing you to see the prior invocation without having to call it again.
+
+*Looking for feedback* should this mode tell you where the codelens lines are being added? [Contact me and let me know your thoughts!](mailto:bram+feedback@stenography.dev)
 
 ### Comment Mode
 
@@ -98,3 +106,7 @@ Initial release of Stenography Extension!
 
 - Fixed bug where cache gets stuck on max invocations. Can be cleared by toggling Codelens off and on again.
 - Fixed escape regex bug when text was null
+
+### 1.1.2
+
+- Small README updates
