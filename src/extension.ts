@@ -390,7 +390,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	});
 
 	let resetCache = vscode.commands.registerCommand('stenography.resetCache', async () => {
-		await context.workspaceState.update(CACHE_NAME, defaultData);
+		// await context.workspaceState.update(CACHE_NAME, defaultData);
 		vscode.window.showInformationMessage('Cache reset');
 	});
 
@@ -408,6 +408,16 @@ export async function activate(context: vscode.ExtensionContext) {
 		const editor = vscode.window.activeTextEditor;
 		await logic(editor, true);
 	});
+
+	// let disposableShowLines = vscode.commands.registerCommand('stenography.showLines', async () => {
+	// 	vscode.window.showInformationMessage('showLines');
+	// });
+
+	// const autopilotStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
+	// autopilotStatusBarItem.text = 'Stenography';
+	// autopilotStatusBarItem.command = 'stenography.resetCache';
+	// autopilotStatusBarItem.show();
+	// context.subscriptions.push(autopilotStatusBarItem);
 
 	context.subscriptions.push(disposableDryRun);
 	context.subscriptions.push(disposable);

@@ -17,15 +17,15 @@ export class CodelensProvider implements vscode.CodeLensProvider {
         this.context = context;
 
 
-        console.log('codelens provider constructor: ' + JSON.stringify(cache));
+        // console.log('codelens provider constructor: ' + JSON.stringify(cache));
 
         vscode.workspace.onDidChangeConfiguration((_) => {
-            console.log('onDidChangeConfiguration');
+            // console.log('onDidChangeConfiguration');
             this._onDidChangeCodeLenses.fire();
         });
 
         vscode.workspace.onDidSaveTextDocument(async (document) => {
-            console.log('onDidSaveTextDocument + ' + document.fileName);
+            // console.log('onDidSaveTextDocument + ' + document.fileName);
             this.cache['documentCache'][document.fileName] = null;
             this.cache['codeLensCache'][document.fileName] = null;
             await this.context.workspaceState.update(CACHE_NAME, this.cache);
@@ -35,7 +35,7 @@ export class CodelensProvider implements vscode.CodeLensProvider {
     }
 
     public provideCodeLenses(document: vscode.TextDocument, token: vscode.CancellationToken): vscode.CodeLens[] | Thenable<vscode.CodeLens[]> {
-        console.log('provideCodeLenses ? ' + vscode.workspace.getConfiguration().get('stenography.codeLensMode'));
+        // console.log('provideCodeLenses ? ' + vscode.workspace.getConfiguration().get('stenography.codeLensMode'));
         
         if (vscode.workspace.getConfiguration().get('stenography.codeLensMode')) {
             const STENOGRAPHY_API_KEY: string | null | undefined = vscode.workspace.getConfiguration().get('stenography.apiKey');
@@ -44,24 +44,22 @@ export class CodelensProvider implements vscode.CodeLensProvider {
                 return [];
             }
     
-            
-    
             const filename: string = document.fileName;
             const fullFileName: string[] | undefined = document.fileName.split('.');
             const fileType: string | undefined = fullFileName.slice(-1)[0];
             let language = FILETYPES[fileType];
     
             if (!language) {
-                console.log('provideCodeLenses: language not found');
+                // console.log('provideCodeLenses: language not found');
                 return [];
             }
     
     
             if (this.cache.maxedOutInvocations) {
-                console.log('maxed out invocations');
+                // console.log('maxed out invocations');
                 const newDatetime = new Date().getTime();
                 if (Date.parse(this.cache.lastChecked.toString()) + (1000 * 60 * 60 * 24)   < newDatetime) {
-                    console.log('last checked 24 hours ago -- seeing if invocations reset ' + new Date().toLocaleString());
+                    // console.log('last checked 24 hours ago -- seeing if invocations reset ' + new Date().toLocaleString());
                     return vscode.window.withProgress({
                         location: vscode.ProgressLocation.Window,
                         cancellable: false,
@@ -71,12 +69,12 @@ export class CodelensProvider implements vscode.CodeLensProvider {
                         fetchStenographyAutopilot(STENOGRAPHY_API_KEY!, document.getText(), language, true).then((response) => {
                             if (response.error) {
                                 vscode.window.showErrorMessage(response.error.message);
-                                console.log('response: ' + JSON.stringify(response));
+                                // console.log('response: ' + JSON.stringify(response));
                                 this.cache.lastChecked = new Date(newDatetime);
                                 this.context.workspaceState.update(CACHE_NAME, this.cache); // TODO: does this need to be awaited or is that a nice to have?
                                 return [];
                             } else {
-                                console.log('response: ' + JSON.stringify(response));
+                                // console.log('response: ' + JSON.stringify(response));
                                 this.cache.maxedOutInvocations = false;
                                 this.cache.lastChecked = new Date(newDatetime);
                                 this.context.workspaceState.update(CACHE_NAME, this.cache); // TODO: does this need to be awaited or is that a nice to have?
@@ -93,7 +91,7 @@ export class CodelensProvider implements vscode.CodeLensProvider {
             this.codeLenses = [];
     
             if (filename in this.cache.codeLensCache && this.cache.codeLensCache[filename] !== null) {
-                console.log('cache hit');
+                // console.log('cache hit');
                 for (let i = 0; i < this.cache.codeLensCache[filename]!.length; i++) {
                     const codeLensWrapper = [];
                     const codeLensObj = this.cache.codeLensCache[filename]![i];
@@ -106,7 +104,7 @@ export class CodelensProvider implements vscode.CodeLensProvider {
                         const textRange = new vscode.Range(line.range.start, line.range.end);
     
                         if (textRange) {
-                            console.log('adding codelens w command');
+                            // console.log('adding codelens w command');
                             codeLensWrapper.push(new vscode.CodeLens(textRange, codeLensObj.command));
                         }
                     }
@@ -116,10 +114,10 @@ export class CodelensProvider implements vscode.CodeLensProvider {
                 return this.codeLenses;
             } else {
                 this.cache.codeLensCache[filename] = []; // prevent dupe calls
-                console.log('cache miss');
+                // console.log('cache miss');
                 return vscode.window.withProgress({
                     location: vscode.ProgressLocation.Window,
-                    cancellable: false,
+                    cancellable: true,
                     title: 'Fetching from Stenography Autopilot'
                 }, async (progress) => {
                     try {
@@ -153,17 +151,14 @@ export class CodelensProvider implements vscode.CodeLensProvider {
                                         this.cache.lastChecked = new Date();
                                         this.context.workspaceState.update(CACHE_NAME, this.cache);
                                         vscode.window.showErrorMessage(errorMessage); 
+                                    } else {
+                                        vscode.window.showErrorMessage(data.error);
                                     }
 
                                     return [];
                                 }
         
                                 
-                                if (data.error) {
-                                    console.error(data.error);
-                                    vscode.window.showErrorMessage(data.error);
-                                    return [];
-                                }
                                 data.code_blocks.forEach((block: any) => {
                                     var firstLine = document.lineAt(block.startPosition.row - 1);
                                     var textRange = new vscode.Range(firstLine.range.start, firstLine.range.end);
@@ -198,14 +193,14 @@ export class CodelensProvider implements vscode.CodeLensProvider {
                 });
             }
         } else {
-            console.log('no stenography codeLensMode');
+            // console.log('no stenography codeLensMode');
             return [];
         }
     }
 
     public resolveCodeLens(codeLens: vscode.CodeLens, token: vscode.CancellationToken) {
+        console.log(codeLens);
         if (vscode.workspace.getConfiguration("stenography.autopilotSettings").get("codeLensMode", true)) {
-            console.log('active');
             codeLens.command = {
                 title: '<stenography autopilot />',
                 tooltip: `- generated by stenography autopilot [ 🚗👩‍✈️ ]`,
