@@ -4,8 +4,8 @@
 import * as vscode from 'vscode';
 import fetch from 'node-fetch';
 import { CodelensProvider } from './CodelensProvider';
-import { CacheObject, CACHE_NAME } from './utils'; 
-import * as say from 'say';
+import { CacheObject, CACHE_NAME, getFileType } from './utils'; 
+import { comment } from './comment';
 
 let STENOGRAPHY_API_KEY: string | null | undefined;
 
@@ -330,6 +330,9 @@ const logic = async (editor: vscode.TextEditor | undefined, isDryRun = true) => 
 	}
 };
 
+export const stenographyStatusBar = (autopilotStatusBarItem: vscode.StatusBarItem) => {
+	return autopilotStatusBarItem;
+};
        /*
        This code is registering a command that will be called when the user presses `ctrl+shift+p` and then types "stenography.autopilot".
        It also registers another command that will be called when the user presses `ctrl+shift+p` and then types "stenography.autopilotdryrun"
@@ -346,9 +349,18 @@ export async function activate(context: vscode.ExtensionContext) {
 		lastChecked: new Date(),
 	};
 	
-	const cache = context.workspaceState.get<CacheObject>(CACHE_NAME, defaultData);
+	if (context.workspaceState.get<CacheObject>(CACHE_NAME)) {
+		await context.workspaceState.update(CACHE_NAME, {
+			documentCache: {},
+			codeLensCache: {},
+			maxedOutInvocations: false,
+			lastChecked: new Date(),
+		});
+	}
+
+	context.workspaceState.get<CacheObject>(CACHE_NAME, defaultData); // TODO: is this necessary?
 	await context.workspaceState.update(CACHE_NAME, defaultData);
-	console.log('cache: ' + JSON.stringify(cache));
+	// console.log('cache: ' + JSON.stringify(cache));
 
 	STENOGRAPHY_API_KEY = vscode.workspace.getConfiguration().get('stenography.apiKey');
 
@@ -371,15 +383,27 @@ export async function activate(context: vscode.ExtensionContext) {
 		});  
 	}
 
-	const codelensProvider = new CodelensProvider(context, cache);
-
+	const codelensProvider = new CodelensProvider(context);
     vscode.languages.registerCodeLensProvider("*", codelensProvider);
 
-
     vscode.commands.registerCommand("stenography.codelensAction", (args: any) => {
-        vscode.window.showInformationMessage(args, 'speak').then((value) => {
-			if (value === 'speak') {
-				say.speak(args);
+        vscode.window.showInformationMessage(args.stenographyResult.pm, 'Commit to File', 'Share').then((value) => {
+			const editor = vscode.window.activeTextEditor;
+			if (value === 'Commit to File') {
+				console.log('Commit to File');
+				
+				if (editor) {
+					comment(editor, getFileType(editor?.document.fileName), args);
+				} else {
+					vscode.window.showErrorMessage('No active editor');
+				}
+			}
+			if (value === 'Share') {
+				if (editor) {
+					vscode.env.openExternal(vscode.Uri.parse(`https://carbon.now.sh/?l=${getFileType(editor?.document.fileName)}&code=${encodeURIComponent(args.stenographyResult.pm + '\n\n' + args.stenographyResult.code)}`));
+				} else {
+					vscode.window.showErrorMessage('No active editor');
+				}
 			}
 		});
     });
@@ -390,7 +414,12 @@ export async function activate(context: vscode.ExtensionContext) {
 	});
 
 	let resetCache = vscode.commands.registerCommand('stenography.resetCache', async () => {
-		// await context.workspaceState.update(CACHE_NAME, defaultData);
+		await context.workspaceState.update(CACHE_NAME, {
+			documentCache: {},
+			codeLensCache: {},
+			maxedOutInvocations: false,
+			lastChecked: new Date(),
+		});
 		vscode.window.showInformationMessage('Cache reset');
 	});
 
@@ -409,16 +438,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		await logic(editor, true);
 	});
 
-	// let disposableShowLines = vscode.commands.registerCommand('stenography.showLines', async () => {
-	// 	vscode.window.showInformationMessage('showLines');
-	// });
-
-	// const autopilotStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
-	// autopilotStatusBarItem.text = 'Stenography';
-	// autopilotStatusBarItem.command = 'stenography.resetCache';
-	// autopilotStatusBarItem.show();
-	// context.subscriptions.push(autopilotStatusBarItem);
-
+	
 	context.subscriptions.push(disposableDryRun);
 	context.subscriptions.push(disposable);
 	context.subscriptions.push(setKeyDisposable);
@@ -427,4 +447,7 @@ export async function activate(context: vscode.ExtensionContext) {
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() { }
+export async function deactivate(context: vscode.ExtensionContext) {
+	await context.workspaceState.update(CACHE_NAME, null);
+	console.log('deactivating');
+}

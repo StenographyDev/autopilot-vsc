@@ -9,11 +9,9 @@ export class CodelensProvider implements vscode.CodeLensProvider {
     private _onDidChangeCodeLenses: vscode.EventEmitter<void> = new vscode.EventEmitter<void>();
     public readonly onDidChangeCodeLenses: vscode.Event<void> = this._onDidChangeCodeLenses.event;
 
-    cache: CacheObject;
     context: vscode.ExtensionContext;
 
-    constructor(context: vscode.ExtensionContext, cache: CacheObject) {
-        this.cache = cache;
+    constructor(context: vscode.ExtensionContext) {
         this.context = context;
 
 
@@ -26,11 +24,16 @@ export class CodelensProvider implements vscode.CodeLensProvider {
 
         vscode.workspace.onDidSaveTextDocument(async (document) => {
             // console.log('onDidSaveTextDocument + ' + document.fileName);
-            this.cache['documentCache'][document.fileName] = null;
-            this.cache['codeLensCache'][document.fileName] = null;
-            await this.context.workspaceState.update(CACHE_NAME, this.cache);
+            const cache = context.workspaceState.get<CacheObject>(CACHE_NAME);
+            if (cache) {
+                cache['documentCache'][document.fileName] = null;
+                cache['codeLensCache'][document.fileName] = null;
+                // await this.context.workspaceState.update(CACHE_NAME, cache);
 
-            this._onDidChangeCodeLenses.fire();
+                this._onDidChangeCodeLenses.fire();
+            } else {
+                console.log('cache not found');
+            }
         });
     }
 
@@ -54,11 +57,11 @@ export class CodelensProvider implements vscode.CodeLensProvider {
                 return [];
             }
     
+            const cache = this.context.workspaceState.get<CacheObject>(CACHE_NAME)!;
     
-            if (this.cache.maxedOutInvocations) {
-                // console.log('maxed out invocations');
+            if (cache.maxedOutInvocations) {
                 const newDatetime = new Date().getTime();
-                if (Date.parse(this.cache.lastChecked.toString()) + (1000 * 60 * 60 * 24)   < newDatetime) {
+                if (Date.parse(cache.lastChecked.toString()) + (1000 * 60 * 60 * 24)   < newDatetime) {
                     // console.log('last checked 24 hours ago -- seeing if invocations reset ' + new Date().toLocaleString());
                     return vscode.window.withProgress({
                         location: vscode.ProgressLocation.Window,
@@ -70,14 +73,14 @@ export class CodelensProvider implements vscode.CodeLensProvider {
                             if (response.error) {
                                 vscode.window.showErrorMessage(response.error.message);
                                 // console.log('response: ' + JSON.stringify(response));
-                                this.cache.lastChecked = new Date(newDatetime);
-                                this.context.workspaceState.update(CACHE_NAME, this.cache); // TODO: does this need to be awaited or is that a nice to have?
+                                cache.lastChecked = new Date(newDatetime);
+                                this.context.workspaceState.update(CACHE_NAME, cache); // TODO: does this need to be awaited or is that a nice to have?
                                 return [];
                             } else {
                                 // console.log('response: ' + JSON.stringify(response));
-                                this.cache.maxedOutInvocations = false;
-                                this.cache.lastChecked = new Date(newDatetime);
-                                this.context.workspaceState.update(CACHE_NAME, this.cache); // TODO: does this need to be awaited or is that a nice to have?
+                                cache.maxedOutInvocations = false;
+                                cache.lastChecked = new Date(newDatetime);
+                                this.context.workspaceState.update(CACHE_NAME, cache); // TODO: does this need to be awaited or is that a nice to have?
                             }
                             progress.report({ increment: 100 });
                         });
@@ -90,11 +93,11 @@ export class CodelensProvider implements vscode.CodeLensProvider {
     
             this.codeLenses = [];
     
-            if (filename in this.cache.codeLensCache && this.cache.codeLensCache[filename] !== null) {
+            if (filename in cache.codeLensCache && cache.codeLensCache[filename] !== null) {
                 // console.log('cache hit');
-                for (let i = 0; i < this.cache.codeLensCache[filename]!.length; i++) {
+                for (let i = 0; i < cache.codeLensCache[filename]!.length; i++) {
                     const codeLensWrapper = [];
-                    const codeLensObj = this.cache.codeLensCache[filename]![i];
+                    const codeLensObj = cache.codeLensCache[filename]![i];
                     const regex = new RegExp(escapeRegExp(codeLensObj.boundTo), 'g');
     
                     const text = document.getText();
@@ -104,7 +107,6 @@ export class CodelensProvider implements vscode.CodeLensProvider {
                         const textRange = new vscode.Range(line.range.start, line.range.end);
     
                         if (textRange) {
-                            // console.log('adding codelens w command');
                             codeLensWrapper.push(new vscode.CodeLens(textRange, codeLensObj.command));
                         }
                     }
@@ -113,84 +115,90 @@ export class CodelensProvider implements vscode.CodeLensProvider {
     
                 return this.codeLenses;
             } else {
-                this.cache.codeLensCache[filename] = []; // prevent dupe calls
-                // console.log('cache miss');
-                return vscode.window.withProgress({
-                    location: vscode.ProgressLocation.Window,
-                    cancellable: true,
-                    title: 'Fetching from Stenography Autopilot'
-                }, async (progress) => {
-                    try {
-                        progress.report({ increment: 0 });
-                        return fetchStenographyAutopilot(STENOGRAPHY_API_KEY!, document.getText(), language, false).then((data: any) => {
-                            try {
-        
-                                if (data.error) {
-                                    let errorMessage = data.error.message;
-                                    if(errorMessage.includes('Unauthorized POST')) {
-                                        errorMessage = 'Please set a valid API key in the settings.\nYou can get an API key here: https://stenography.dev/dashboard. Refer to README for more help!';
-                                        vscode.window.showErrorMessage(errorMessage, 'Input API Key', 'Get New API Key').then(async (value) => {
-                                            if (value === 'Input API Key') {
-                                                showInputBox().then((apiKey) => {
-                                                    if (apiKey) {
-                                                        setStenographyAPIKey(apiKey);
-                                                    }
-                                                }).catch((err) => {
-                                                    vscode.window.showErrorMessage(`Stenography Autopilot: err: ${err}`);
-                                                });
-                                            }
-
-                                            if (value === 'Get New API Key') {
-                                                vscode.env.openExternal(vscode.Uri.parse('https://stenography.dev/dashboard'));
-                                            }
-                                                
+                cache.codeLensCache[filename] = []; // prevent dupe calls
+                return this.context.workspaceState.update(CACHE_NAME, cache).then(() => {
+                    return vscode.window.withProgress({
+                        location: vscode.ProgressLocation.Window,
+                        cancellable: true,
+                        title: 'Fetching from Stenography Autopilot'
+                    }, async (progress) => {
+                        try {
+                            progress.report({ increment: 0 });
+                            return fetchStenographyAutopilot(STENOGRAPHY_API_KEY!, document.getText(), language, false).then((data: any) => {
+                                try {
+            
+                                    if (data.error) {
+                                        let errorMessage = data.error.message;
+                                        if(errorMessage.includes('Unauthorized POST')) {
+                                            errorMessage = 'Please set a valid API key in the settings.\nYou can get an API key here: https://stenography.dev/dashboard. Refer to README for more help!';
+                                            vscode.window.showErrorMessage(errorMessage, 'Input API Key', 'Get New API Key').then(async (value) => {
+                                                if (value === 'Input API Key') {
+                                                    showInputBox().then((apiKey) => {
+                                                        if (apiKey) {
+                                                            setStenographyAPIKey(apiKey);
+                                                        }
+                                                    }).catch((err) => {
+                                                        vscode.window.showErrorMessage(`Stenography Autopilot: err: ${err}`);
+                                                    });
+                                                }
+    
+                                                if (value === 'Get New API Key') {
+                                                    vscode.env.openExternal(vscode.Uri.parse('https://stenography.dev/dashboard'));
+                                                }
+                                                    
+                                            });
+                                        }
+                                        else if (errorMessage.includes('monthly limit')) {
+                                            cache.maxedOutInvocations = true;
+                                            cache.lastChecked = new Date();
+                                            this.context.workspaceState.update(CACHE_NAME, cache);
+                                            vscode.window.showErrorMessage(errorMessage, 'Upgrade Plan').then(async (value) => {
+                                                if (value === 'Upgrade Plan') {
+                                                    vscode.env.openExternal(vscode.Uri.parse('https://stenography.dev/dashboard'));
+                                                }
+                                            });; 
+                                        } else {
+                                            vscode.window.showErrorMessage(data.error);
+                                        }
+    
+                                        return [];
+                                    }
+            
+                                    
+                                    data.code_blocks.forEach((block: any) => {
+                                        var firstLine = document.lineAt(block.startPosition.row - 1);
+                                        var textRange = new vscode.Range(firstLine.range.start, firstLine.range.end);
+                                        let command = {
+                                            title: "<stenography autopilot />",
+                                            tooltip: block.stenographyResult.pm,
+                                            command: "stenography.codelensAction",
+                                            arguments: [block]
+                                        };
+                                        this.codeLenses.push(new vscode.CodeLens(textRange, command));
+                                        cache.codeLensCache[filename]!.push({
+                                            boundTo: block.stenographyResult.code,
+                                            command: command
                                         });
-                                    }
-                                    else if (errorMessage.includes('monthly limit')) {
-                                        this.cache.maxedOutInvocations = true;
-                                        this.cache.lastChecked = new Date();
-                                        this.context.workspaceState.update(CACHE_NAME, this.cache);
-                                        vscode.window.showErrorMessage(errorMessage); 
-                                    } else {
-                                        vscode.window.showErrorMessage(data.error);
-                                    }
-
+                                    });
+                
+                                    return this.codeLenses;
+                                } catch (err:any) {
+                                    console.error(err);
+                                    vscode.window.showErrorMessage(err);
                                     return [];
                                 }
-        
-                                
-                                data.code_blocks.forEach((block: any) => {
-                                    var firstLine = document.lineAt(block.startPosition.row - 1);
-                                    var textRange = new vscode.Range(firstLine.range.start, firstLine.range.end);
-                                    let command = {
-                                        title: "<stenography autopilot />",
-                                        tooltip: block.stenographyResult.pm,
-                                        command: "stenography.codelensAction",
-                                        arguments: [block.stenographyResult.pm]
-                                    };
-                                    this.codeLenses.push(new vscode.CodeLens(textRange, command));
-                                    this.cache.codeLensCache[filename]!.push({
-                                        boundTo: block.stenographyResult.code,
-                                        command: command
-                                    });
-                                });
-            
-                                return this.codeLenses;
-                            } catch (err:any) {
-                                console.error(err);
-                                vscode.window.showErrorMessage(err);
+                            }).catch((err: any) => {
+                                console.error(err.error);
+                                vscode.window.showErrorMessage(err.error);
                                 return [];
-                            }
-                        }).catch((err: any) => {
-                            console.error(err.error);
-                            vscode.window.showErrorMessage(err.error);
+                            });
+                        } catch (err) {
+                            console.error(err);
                             return [];
-                        });
-                    } catch (err) {
-                        console.error(err);
-                        return [];
-                    }
+                        }
+                    });
                 });
+                
             }
         } else {
             // console.log('no stenography codeLensMode');

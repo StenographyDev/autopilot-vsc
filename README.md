@@ -59,13 +59,15 @@ This extension contributes the following settings:
 
 * `stenography.apiKey`: **[REQUIRED]** set your [Stenography API key](https://stenography.dev/dashboard) in vsc settings (`cmd+,`)
 * `stenography.autopilotSettings.zeroCol`: documentation to be inserted on the first column, instead of where the code block starts
+* `stenography.codeLensMode`: Enable/disable codelens mode (enabled by default)
 
 ## Known Issues
 
 - Replacing current comments above code blocks. Currently Stenography does not replace/overwrite comments due to edge cases of overwriting code that people wrote manually. It will append the newest version one line above the code block (run dry-run to see where Stenography will comment)
 - The empty lines above code blocks. The VSC editor is `thenable` and in order to add explanations correctly, a new line has to be inserted **before** the code block comment is.
-- Sometimes API key wont save to VSC. Try to paste into box and click on outside of the box or use the command `Set Stenography API Key`
-
+- The Codelens API call can cause slowdown if you have multiple tabs open. The reason for this is that ranges and commands are both resolved in the API call. [Open bug bounty fix!](https://stackoverflow.com/questions/70058746/async-call-result-provides-ranges-and-command-for-codelens)
+- Multiple save presses while one call is in flight will call the other as well. Current solution is to only hit save once while Stenography is in flight.
+- Initial file loads will cause CodeLens to take a while to show up, and then you may need to lose context of file and go back to see CodeLens
 
 ## Release Notes
 
@@ -110,3 +112,11 @@ Initial release of Stenography Extension!
 ### 1.1.2
 
 - Small README updates
+
+### 1.1.3
+
+- cache is now more up to date, and less stale when `Reset Cache` is called
+- `Reset Cache` now works lol
+- `speak` is gone
+- `Commit to File` takes Steno response and commits it to file as a comment. *Hint: use `zeroCol` setting to move it to col zero*
+

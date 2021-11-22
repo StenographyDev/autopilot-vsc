@@ -1,5 +1,4 @@
 import fetch from 'node-fetch';
-import * as vscode from 'vscode';
 /* eslint-disable @typescript-eslint/naming-convention */
 
 export const FILETYPES:any = {
@@ -53,6 +52,12 @@ export interface CacheObject {
 	maxedOutInvocations: boolean,
 	lastChecked: Date
 }
+
+export const getFileType = (fileName: string) => {
+	const fullFileName: string[] | undefined = fileName.split('.');
+	const fileType: string | undefined = fullFileName.slice(-1)[0];
+	return FILETYPES[fileType];
+};
 
 export const fetchStenographyAutopilot = async (api_key: string, code: string, language: string, dryRun: boolean = true): Promise<AutopilotResponse> => {
 
