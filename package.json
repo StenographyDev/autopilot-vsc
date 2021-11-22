@@ -25,7 +25,7 @@
     "onCommand:stenography.autopilot-dryrun",
     "onCommand:stenography.setKey",
     "onCommand:stenography.resetCache",
-    "*"
+    "onStartupFinished"
   ],
   "main": "./dist/extension.js",
   "contributes": {
