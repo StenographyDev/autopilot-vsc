@@ -341,12 +341,13 @@ export const stenographyStatusBar = (autopilotStatusBarItem: vscode.StatusBarIte
        */
 export async function activate(context: vscode.ExtensionContext) {
 	console.log('Congratulations, your extension "stenography" is now active!');
-	
+
 	const defaultData: CacheObject = {
 		documentCache: {},
 		codeLensCache: {},
 		maxedOutInvocations: false,
 		lastChecked: new Date(),
+		isProcessing: false,
 	};
 	
 	if (context.workspaceState.get<CacheObject>(CACHE_NAME)) {
@@ -387,7 +388,8 @@ export async function activate(context: vscode.ExtensionContext) {
     vscode.languages.registerCodeLensProvider("*", codelensProvider);
 
     vscode.commands.registerCommand("stenography.codelensAction", (args: any) => {
-        vscode.window.showInformationMessage(args.stenographyResult.pm, 'Commit to File', 'Share').then((value) => {
+        // args.stenographyResult.pm
+		vscode.window.showInformationMessage(args.stenographyResult.pm, 'Commit to File', 'Share').then((value) => {
 			const editor = vscode.window.activeTextEditor;
 			if (value === 'Commit to File') {
 				console.log('Commit to File');

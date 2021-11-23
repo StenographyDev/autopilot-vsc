@@ -12,10 +12,11 @@ export const FILETYPES:any = {
 
 export const CACHE_NAME = "stenographyCache";
 
-interface StenographyResponse {
+export interface StenographyResponse {
 	pm: string,
 	code: string,
-	metadata: any
+	metadata: any,
+	error?: string,
 }
 
 interface CodeBlock {
@@ -24,20 +25,20 @@ interface CodeBlock {
 	endPosition: any
 }
 
-interface AutopilotResponse {
+export interface AutopilotResponse {
 	invocation_counter: number,
 	code_blocks?: [CodeBlock]
 	error?: any
 }
 
 interface DocumentCache {
-	[key: string]: string | null
+	[key: string]: any | null
 }
 
 interface CodeLensCache {
 	[key: string]: {
 		boundTo: string,
-		command: {
+		command?: {
 			title: string;
 			tooltip: any;
 			command: string;
@@ -50,7 +51,8 @@ export interface CacheObject {
 	documentCache: DocumentCache,
 	codeLensCache: CodeLensCache,
 	maxedOutInvocations: boolean,
-	lastChecked: Date
+	lastChecked: Date,
+	isProcessing: boolean
 }
 
 export const getFileType = (fileName: string) => {
@@ -90,11 +92,45 @@ export const fetchStenographyAutopilot = async (api_key: string, code: string, l
 		if (typeof json === 'string') {
 			throw new Error(json);
 		}
-		console.log(`Autopilot response: ${JSON.stringify(json)}`);
+		console.log(`Autopilot response: ${JSON.stringify(json, null, 2)}`);
 		return json;
 	} catch (err: any) {
 		console.error(err);
         return { error: err, invocation_counter: -1 };
+	}
+};
+
+export const fetchStenography = async (api_key: string, code: string, language: string): Promise<StenographyResponse> => {
+
+    console.log(`Fetching stenography for ${language}`);
+
+	let fetchUrl = 'https://stenography-worker.stenography.workers.dev/';
+
+	let options = {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ 
+			"code": code, 
+			"api_key": api_key.trim(), 
+			"language": language, 
+			"audience": "pm",
+			"stackoverflow": false,
+			"populate": false
+		})
+	};
+
+	try {
+		const resp = await fetch(fetchUrl, options);
+
+		const json: any = await resp.json();
+		if (typeof json === 'string') {
+			throw new Error(json);
+		}
+		console.log(`Stenography response: ${JSON.stringify(json)}`);
+		return json;
+	} catch (err: any) {
+		console.error(err);
+        return { error: err, pm: '', code: '', metadata: {} };
 	}
 };
 
