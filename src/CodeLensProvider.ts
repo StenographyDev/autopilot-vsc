@@ -4,18 +4,15 @@ import { FILETYPES, fetchStenographyAutopilot, escapeRegExp, CacheObject, CACHE_
 import { showInputBox, setStenographyAPIKey } from './extension';
 export class CodelensProvider implements vscode.CodeLensProvider {
 
-
     private codeLenses: vscode.CodeLens[] = [];
     private _onDidChangeCodeLenses: vscode.EventEmitter<void> = new vscode.EventEmitter<void>();
     public readonly onDidChangeCodeLenses: vscode.Event<void> = this._onDidChangeCodeLenses.event;
 
     context: vscode.ExtensionContext;
+    isProcessing: boolean = false;
 
     constructor(context: vscode.ExtensionContext) {
         this.context = context;
-
-
-        // console.log('codelens provider constructor: ' + JSON.stringify(cache));
 
         vscode.workspace.onDidChangeConfiguration((_) => {
             // console.log('onDidChangeConfiguration');
@@ -26,11 +23,16 @@ export class CodelensProvider implements vscode.CodeLensProvider {
             // console.log('onDidSaveTextDocument + ' + document.fileName);
             const cache = context.workspaceState.get<CacheObject>(CACHE_NAME);
             if (cache) {
-                // cache['documentCache'][document.fileName] = null;
-                cache['codeLensCache'][document.fileName] = null;
-                await this.context.workspaceState.update(CACHE_NAME, cache);
+                if (this.isProcessing) {
+                    console.log('isProcessing');
+                    return;
+                } else {
+                    // cache['documentCache'][document.fileName] = null;
+                    cache['codeLensCache'][document.fileName] = null;
+                    await this.context.workspaceState.update(CACHE_NAME, cache);
 
-                this._onDidChangeCodeLenses.fire();
+                    this._onDidChangeCodeLenses.fire();
+                }
             } else {
                 console.log('cache not found');
             }
@@ -115,6 +117,10 @@ export class CodelensProvider implements vscode.CodeLensProvider {
     
                 return this.codeLenses;
             } else {
+                if (this.isProcessing) {
+                    return this.codeLenses;
+                }
+
                 cache.codeLensCache[filename] = []; // prevent dupe calls
                 cache.documentCache[filename] = [];
 
@@ -126,7 +132,7 @@ export class CodelensProvider implements vscode.CodeLensProvider {
                     }, async (progress) => {
                         try {
                             progress.report({ increment: 0 });
-                            cache.isProcessing = true;
+                            this.isProcessing = true;
                             return fetchStenographyAutopilot(STENOGRAPHY_API_KEY!, document.getText(), language, false).then((data: any) => {
                                 try {
             
@@ -180,29 +186,29 @@ export class CodelensProvider implements vscode.CodeLensProvider {
 
 
                                         this.codeLenses.push(new vscode.CodeLens(textRange, command));
-                                        cache.documentCache[filename]!.push(block);
                                         cache.codeLensCache[filename]!.push({
                                             boundTo: block.stenographyResult.code,
                                             command: command
                                         });
                                     });
 
-                                    cache.isProcessing = false;
+                                    this.isProcessing = false;
                 
                                     return this.codeLenses;
                                 } catch (err:any) {
                                     console.error(err);
                                     vscode.window.showErrorMessage(err);
-                                    return [];
+                                    this.isProcessing = false;
+                                    return this.codeLenses;
                                 }
                             }).catch((err: any) => {
                                 console.error(err.error);
                                 vscode.window.showErrorMessage(err.error);
-                                return [];
+                                return this.codeLenses;
                             });
                         } catch (err) {
                             console.error(err);
-                            return [];
+                            return this.codeLenses;
                         }
                     });
                 });

@@ -388,7 +388,6 @@ export async function activate(context: vscode.ExtensionContext) {
     vscode.languages.registerCodeLensProvider("*", codelensProvider);
 
     vscode.commands.registerCommand("stenography.codelensAction", (args: any) => {
-        // args.stenographyResult.pm
 		vscode.window.showInformationMessage(args.stenographyResult.pm, 'Commit to File', 'Share').then((value) => {
 			const editor = vscode.window.activeTextEditor;
 			if (value === 'Commit to File') {

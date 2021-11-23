@@ -120,3 +120,6 @@ Initial release of Stenography Extension!
 - `speak` is gone
 - `Commit to File` takes Steno response and commits it to file as a comment. *Hint: use `zeroCol` setting to move it to col zero*
 
+### 1.1.4
+
+- debounced saving so only one Stenography can be in flight
