@@ -123,3 +123,9 @@ Initial release of Stenography Extension!
 ### 1.1.4
 
 - debounced saving so only one Stenography can be in flight
+
+### 1.1.5
+
+- cache timeout for better UX when cache is slow
+- added max comment width when sharing or committing to file
+- `commentGenerator` == idempotent comment generator for Stenography VSC

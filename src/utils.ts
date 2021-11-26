@@ -11,6 +11,7 @@ export const FILETYPES:any = {
 };
 
 export const CACHE_NAME = "stenographyCache";
+const DEBUG = false;
 
 export interface StenographyResponse {
 	pm: string,
@@ -63,7 +64,9 @@ export const getFileType = (fileName: string) => {
 
 export const fetchStenographyAutopilot = async (api_key: string, code: string, language: string, dryRun: boolean = true): Promise<AutopilotResponse> => {
 
-    console.log(`Fetching stenography autopilot for ${language}`);
+    if(DEBUG) {
+		console.log(`Fetching stenography autopilot for ${language}`);
+	}
 
 	let fetchUrl = 'https://stenography-worker.stenography.workers.dev/autopilot';
 
@@ -92,7 +95,9 @@ export const fetchStenographyAutopilot = async (api_key: string, code: string, l
 		if (typeof json === 'string') {
 			throw new Error(json);
 		}
-		console.log(`Autopilot response: ${JSON.stringify(json, null, 2)}`);
+		if(DEBUG) {
+			console.log(`Autopilot response: ${JSON.stringify(json, null, 2)}`);
+		}
 		return json;
 	} catch (err: any) {
 		console.error(err);
@@ -102,7 +107,9 @@ export const fetchStenographyAutopilot = async (api_key: string, code: string, l
 
 export const fetchStenography = async (api_key: string, code: string, language: string): Promise<StenographyResponse> => {
 
-    console.log(`Fetching stenography for ${language}`);
+    if(DEBUG) {
+		console.log(`Fetching stenography for ${language}`);
+	}
 
 	let fetchUrl = 'https://stenography-worker.stenography.workers.dev/';
 
@@ -126,7 +133,9 @@ export const fetchStenography = async (api_key: string, code: string, language: 
 		if (typeof json === 'string') {
 			throw new Error(json);
 		}
-		console.log(`Stenography response: ${JSON.stringify(json)}`);
+		if(DEBUG) {
+			console.log(`Stenography response: ${JSON.stringify(json)}`);
+		}
 		return json;
 	} catch (err: any) {
 		console.error(err);

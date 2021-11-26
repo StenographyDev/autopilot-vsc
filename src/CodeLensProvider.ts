@@ -24,10 +24,8 @@ export class CodelensProvider implements vscode.CodeLensProvider {
             const cache = context.workspaceState.get<CacheObject>(CACHE_NAME);
             if (cache) {
                 if (this.isProcessing) {
-                    console.log('isProcessing');
                     return;
                 } else {
-                    // cache['documentCache'][document.fileName] = null;
                     cache['codeLensCache'][document.fileName] = null;
                     await this.context.workspaceState.update(CACHE_NAME, cache);
 
@@ -50,9 +48,7 @@ export class CodelensProvider implements vscode.CodeLensProvider {
             }
     
             const filename: string = document.fileName;
-            const fullFileName: string[] | undefined = document.fileName.split('.');
-            const fileType: string | undefined = fullFileName.slice(-1)[0];
-            let language = FILETYPES[fileType];
+            let language = getFileType(filename);
     
             if (!language) {
                 // console.log('provideCodeLenses: language not found');
@@ -92,11 +88,15 @@ export class CodelensProvider implements vscode.CodeLensProvider {
                     return [];
                 }
             }
-    
+
             this.codeLenses = [];
     
             if (filename in cache.codeLensCache && cache.codeLensCache[filename] !== null) {
-                // console.log('cache hit');
+                if (cache.codeLensCache[filename]!.length === 0) {
+                    setTimeout(() => {
+                        this._onDidChangeCodeLenses.fire();
+                    }, 1000);
+                }
                 for (let i = 0; i < cache.codeLensCache[filename]!.length; i++) {
                     const codeLensWrapper = [];
                     const codeLensObj = cache.codeLensCache[filename]![i];
@@ -172,8 +172,7 @@ export class CodelensProvider implements vscode.CodeLensProvider {
     
                                         return [];
                                     }
-            
-                                    
+                                                
                                     data.code_blocks.forEach((block: any) => {
                                         var firstLine = document.lineAt(block.startPosition.row - 1);
                                         var textRange = new vscode.Range(firstLine.range.start, firstLine.range.end);
@@ -191,9 +190,9 @@ export class CodelensProvider implements vscode.CodeLensProvider {
                                             command: command
                                         });
                                     });
-
+                                    this.context.workspaceState.update(CACHE_NAME, cache);
                                     this.isProcessing = false;
-                
+
                                     return this.codeLenses;
                                 } catch (err:any) {
                                     console.error(err);
@@ -201,7 +200,8 @@ export class CodelensProvider implements vscode.CodeLensProvider {
                                     this.isProcessing = false;
                                     return this.codeLenses;
                                 }
-                            }).catch((err: any) => {
+                            })
+                            .catch((err: any) => {
                                 console.error(err.error);
                                 vscode.window.showErrorMessage(err.error);
                                 return this.codeLenses;

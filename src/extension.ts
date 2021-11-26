@@ -5,7 +5,7 @@ import * as vscode from 'vscode';
 import fetch from 'node-fetch';
 import { CodelensProvider } from './CodelensProvider';
 import { CacheObject, CACHE_NAME, getFileType } from './utils'; 
-import { comment } from './comment';
+import { comment, commentGenerator } from './comment';
 
 let STENOGRAPHY_API_KEY: string | null | undefined;
 
@@ -401,7 +401,9 @@ export async function activate(context: vscode.ExtensionContext) {
 			}
 			if (value === 'Share') {
 				if (editor) {
-					vscode.env.openExternal(vscode.Uri.parse(`https://carbon.now.sh/?l=${getFileType(editor?.document.fileName)}&code=${encodeURIComponent(args.stenographyResult.pm + '\n\n' + args.stenographyResult.code)}`));
+					vscode.env.openExternal(vscode.Uri.parse(`https://carbon.now.sh/?l=${getFileType(editor?.document.fileName)}&code=${encodeURIComponent(commentGenerator({
+						codeRes: args.stenographyResult.pm
+					}, 0, getFileType(editor?.document.fileName)) + '\n\n' + args.stenographyResult.code)}`));
 				} else {
 					vscode.window.showErrorMessage('No active editor');
 				}
