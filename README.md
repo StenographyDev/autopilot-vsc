@@ -11,6 +11,7 @@ Current language support:
 - Python
 - HTML
 - Ruby
+- Vue
 
 New languages are continously being added! [Follow Stenography on Twitter](https://twitter.com/StenographyDev) to be kept up to date about new languages. 
 
@@ -129,3 +130,7 @@ Initial release of Stenography Extension!
 - cache timeout for better UX when cache is slow
 - added max comment width when sharing or committing to file
 - `commentGenerator` == idempotent comment generator for Stenography VSC
+
+### 1.1.6
+
+- `vue` added to supported languages

@@ -8,6 +8,7 @@ export const FILETYPES:any = {
 	"py": "python",
 	"html": "html",
     "rb": "ruby",
+	"vue": "vue",
 };
 
 export const CACHE_NAME = "stenographyCache";

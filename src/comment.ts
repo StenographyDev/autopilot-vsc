@@ -42,6 +42,7 @@ export function commentGenerator(line:any, startChar: number, language:string): 
         'python': { start: "'''", end: "'''" },
         'php': { start: '/*', end: '*/' },
         'ruby': { start: "'''", end: "'''" },
+        'vue': { start: '<!--', end: '-->' },
     };
 
     const commentSeparator = commentTypes[language];
