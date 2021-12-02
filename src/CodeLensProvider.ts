@@ -27,7 +27,7 @@ export class CodelensProvider implements vscode.CodeLensProvider {
                     return;
                 } else {
                     cache['codeLensCache'][document.fileName] = null;
-                    await this.context.workspaceState.update(CACHE_NAME, cache);
+                    this.context.workspaceState.update(CACHE_NAME, cache);
 
                     this._onDidChangeCodeLenses.fire();
                 }
@@ -72,13 +72,13 @@ export class CodelensProvider implements vscode.CodeLensProvider {
                                 vscode.window.showErrorMessage(response.error.message);
                                 // console.log('response: ' + JSON.stringify(response));
                                 cache.lastChecked = new Date(newDatetime);
-                                this.context.workspaceState.update(CACHE_NAME, cache); // TODO: does this need to be awaited or is that a nice to have?
+                                this.context.workspaceState.update(CACHE_NAME, cache);
                                 return [];
                             } else {
                                 // console.log('response: ' + JSON.stringify(response));
                                 cache.maxedOutInvocations = false;
                                 cache.lastChecked = new Date(newDatetime);
-                                this.context.workspaceState.update(CACHE_NAME, cache); // TODO: does this need to be awaited or is that a nice to have?
+                                this.context.workspaceState.update(CACHE_NAME, cache);
                             }
                             progress.report({ increment: 100 });
                         });
@@ -94,7 +94,7 @@ export class CodelensProvider implements vscode.CodeLensProvider {
             if (filename in cache.codeLensCache && cache.codeLensCache[filename] !== null) {
                 if (cache.codeLensCache[filename]!.length === 0) {
                     setTimeout(() => {
-                        this._onDidChangeCodeLenses.fire();
+                        this._onDidChangeCodeLenses.fire(); // todo does this need to have a final break after a certain amount of time? or does the existence of codeLensesCache entail it will resolve?
                     }, 1000);
                 }
                 for (let i = 0; i < cache.codeLensCache[filename]!.length; i++) {
@@ -292,7 +292,7 @@ export class CodelensProvider implements vscode.CodeLensProvider {
                             boundTo: codeBlock.code,
                             command: command
                         });
-                        await this.context.workspaceState.update(CACHE_NAME, cache);
+                        this.context.workspaceState.update(CACHE_NAME, cache);
                         return codeLens;
                     });
                 }

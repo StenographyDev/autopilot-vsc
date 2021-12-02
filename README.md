@@ -69,6 +69,7 @@ This extension contributes the following settings:
 - The Codelens API call can cause slowdown if you have multiple tabs open. The reason for this is that ranges and commands are both resolved in the API call. [Open bug bounty fix!](https://stackoverflow.com/questions/70058746/async-call-result-provides-ranges-and-command-for-codelens)
 - Multiple save presses while one call is in flight will call the other as well. Current solution is to only hit save once while Stenography is in flight.
 - Initial file loads will cause CodeLens to take a while to show up, and then you may need to lose context of file and go back to see CodeLens
+- Extension Crash (may be due to cache or codelens) -- unsure (as of v1.1.7)
 
 ## Release Notes
 
@@ -134,3 +135,7 @@ Initial release of Stenography Extension!
 ### 1.1.6
 
 - `vue` added to supported languages
+
+### 1.1.7
+
+- removed await from cache and lean on timeout
