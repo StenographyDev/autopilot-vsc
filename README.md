@@ -17,6 +17,12 @@ New languages are continously being added! [Follow Stenography on Twitter](https
 
 ## Installation
 
+### Video
+
+[![plain 2 explained](plain-to-explained.png)](https://www.youtube.com/watch?v=8sDsMUUcrtM&ab_channel=BramAdams)
+
+### Text
+
 1. Copy your API key using the `Copy API Key to Clipboard` button from the [Stenography Dashboard](https://stenography.dev/dashboard)
 
 ![dashboard](how-to-dashboard-copy.png)
