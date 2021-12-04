@@ -17,7 +17,11 @@ New languages are continously being added! [Follow Stenography on Twitter](https
 
 ## Installation
 
-1. Input your API Key: `Cmd + Shift + P` -> `Set Stenography API Key`
+1. Copy your API key using the `Copy API Key to Clipboard` button from the [Stenography Dashboard](https://stenography.dev/dashboard)
+
+![dashboard](how-to-dashboard-copy.png)
+
+2. Input your API Key in the VSC extension: `Cmd + Shift + P` -> `Set Stenography API Key`
 
 ![setting api key](install.png)
 
