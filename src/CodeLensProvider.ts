@@ -59,39 +59,47 @@ export class CodelensProvider implements vscode.CodeLensProvider {
     
             if (cache.maxedOutInvocations) {
                 const newDatetime = new Date().getTime();
-                if (Date.parse(cache.lastChecked.toString()) + (1000 * 60 * 60 * 24)   < newDatetime) {
-                    // console.log('last checked 24 hours ago -- seeing if invocations reset ' + new Date().toLocaleString());
+                if (Date.parse(cache.lastChecked.toString()) + (1000 * 60 * 60)   < newDatetime) {
+                    // console.log('last checked an hour ago -- seeing if invocations reset ' + new Date().toLocaleString());
                     return vscode.window.withProgress({
                         location: vscode.ProgressLocation.Window,
                         cancellable: false,
                         title: 'Checking Stenography Plan'
                     }, async (progress) => {
                         progress.report({ increment: 0 });
-                        fetchStenographyAutopilot(STENOGRAPHY_API_KEY!, document.getText(), language, true).then((response) => {
+                        return fetchStenographyAutopilot(STENOGRAPHY_API_KEY!, document.getText(), language, true).then((response) => {
+                            progress.report({ increment: 100 });
                             if (response.error) {
                                 vscode.window.showErrorMessage(response.error.message);
                                 // console.log('response: ' + JSON.stringify(response));
                                 cache.lastChecked = new Date(newDatetime);
                                 this.context.workspaceState.update(CACHE_NAME, cache);
+                                this.isProcessing = false;
                                 return [];
                             } else {
                                 // console.log('response: ' + JSON.stringify(response));
-                                cache.maxedOutInvocations = false;
-                                cache.lastChecked = new Date(newDatetime);
-                                this.context.workspaceState.update(CACHE_NAME, cache);
+                                this.context.workspaceState.update(CACHE_NAME, {
+                                    documentCache: {},
+                                    codeLensCache: {},
+                                    maxedOutInvocations: false,
+                                    lastChecked: new Date(),
+                                });
+                                this.isProcessing = false;
+                                return [];
                             }
-                            progress.report({ increment: 100 });
                         });
-                        return [];
                     });     
                 } else {
                     return [];
                 }
+            } else {
+                // console.log('provideCodeLenses: cache.maxedOutInvocations: ' + cache.maxedOutInvocations);
             }
 
             this.codeLenses = [];
     
             if (filename in cache.codeLensCache && cache.codeLensCache[filename] !== null) {
+                // console.log('provideCodeLenses: cache hit');
                 if (cache.codeLensCache[filename]!.length === 0) {
                     setTimeout(() => {
                         this._onDidChangeCodeLenses.fire(); // todo does this need to have a final break after a certain amount of time? or does the existence of codeLensesCache entail it will resolve?
@@ -117,6 +125,7 @@ export class CodelensProvider implements vscode.CodeLensProvider {
     
                 return this.codeLenses;
             } else {
+                // console.log('provideCodeLenses: cache miss: ' + this.isProcessing);
                 if (this.isProcessing) {
                     return this.codeLenses;
                 }
