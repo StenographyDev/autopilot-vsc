@@ -157,3 +157,8 @@ Initial release of Stenography Extension!
 ### 1.1.9
 
 - fixed `maxInvocation` checker to run more freuently, and correctly unblock processing flag
+
+### 1.2.0
+
+- `node-fetch()` -> `axios`. Should hopefully adress any certificate expiration issues. [Please reach out to me if you are still experiencing this bug](mailto:bram+feedback@stenography.dev)
+*Huge thanks to AxiomaAbsurdo for helping me find this bug!!*

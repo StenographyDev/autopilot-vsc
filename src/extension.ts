@@ -2,7 +2,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import fetch from 'node-fetch';
+import axios from 'axios';
 import { CodelensProvider } from './CodelensProvider';
 import { CacheObject, CACHE_NAME, getFileType } from './utils'; 
 import { comment, commentGenerator } from './comment';
@@ -59,11 +59,9 @@ export const fetchStenographyAutopilot = async (code: string, language: string, 
 
 	let fetchUrl = 'https://stenography-worker.stenography.workers.dev/autopilot';
 
+	try {
 
-	let options = {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ 
+		const resp = await axios.post(fetchUrl, JSON.stringify({ 
 			"code": code, 
 			"api_key": STENOGRAPHY_API_KEY?.trim(), 
 			"dry_run": dryRun, 
@@ -75,13 +73,13 @@ export const fetchStenographyAutopilot = async (code: string, language: string, 
 				"stackoverflow": false,
 				"populate": false
 			} 
-		})
-	};
+		}),
+		{
+			headers: { 'Content-Type': 'application/json' }
+		});
 
-	try {
-		const resp = await fetch(fetchUrl, options);
+		const json: any = await resp.data;
 
-		const json: any = await resp.json();
 		if (typeof json === 'string') {
 			throw new Error(json);
 		}

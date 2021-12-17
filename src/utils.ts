@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+import axios from 'axios';
 /* eslint-disable @typescript-eslint/naming-convention */
 
 export const FILETYPES:any = {
@@ -71,10 +71,8 @@ export const fetchStenographyAutopilot = async (api_key: string, code: string, l
 
 	let fetchUrl = 'https://stenography-worker.stenography.workers.dev/autopilot';
 
-	let options = {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ 
+	try {
+		const resp = await axios.post(fetchUrl, JSON.stringify({ 
 			"code": code, 
 			"api_key": api_key.trim(), 
 			"dry_run": dryRun, 
@@ -86,13 +84,12 @@ export const fetchStenographyAutopilot = async (api_key: string, code: string, l
 				"stackoverflow": false,
 				"populate": false
 			} 
-		})
-	};
+		}),
+		{
+			headers: { 'Content-Type': 'application/json' }
+		});
 
-	try {
-		const resp = await fetch(fetchUrl, options);
-
-		const json: any = await resp.json();
+		const json: any = await resp.data;
 		if (typeof json === 'string') {
 			throw new Error(json);
 		}
@@ -114,23 +111,20 @@ export const fetchStenography = async (api_key: string, code: string, language: 
 
 	let fetchUrl = 'https://stenography-worker.stenography.workers.dev/';
 
-	let options = {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ 
+	try {
+		const resp = await axios.post(fetchUrl, JSON.stringify({ 
 			"code": code, 
 			"api_key": api_key.trim(), 
 			"language": language, 
 			"audience": "pm",
 			"stackoverflow": false,
 			"populate": false
-		})
-	};
+		}),
+		{
+			headers: { 'Content-Type': 'application/json' }
+		});
 
-	try {
-		const resp = await fetch(fetchUrl, options);
-
-		const json: any = await resp.json();
+		const json: any = await resp.data;
 		if (typeof json === 'string') {
 			throw new Error(json);
 		}

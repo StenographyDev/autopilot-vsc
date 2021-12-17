@@ -12,7 +12,7 @@
     "url": "https://github.com/StenographyDev/autopilot-vsc"
   },
   "description": "Document entire code files. Automatically.",
-  "version": "1.1.9",
+  "version": "1.2.0",
   "engines": {
     "vscode": "^1.61.0"
   },
@@ -119,8 +119,8 @@
     "webpack-cli": "^4.8.0"
   },
   "dependencies": {
+    "axios": "^0.24.0",
     "lodash": "^4.17.21",
-    "node-fetch": "^3.0.0",
     "say": "^0.16.0"
   }
 }
