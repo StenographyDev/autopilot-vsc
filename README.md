@@ -1,4 +1,18 @@
-# stenography README
+# stenography-autopilot-vsc README
+
+# -->  LINUX AND WINDOWS USERS: READ THIS <---
+
+You may run into an error that looks like this: `certificate has expired`
+
+![](./steno-error.png)
+
+This error is caused by the Certificate Authority from the OS not reaching VSC. [You can read more about it here.](https://github.com/microsoft/vscode/issues/136787)
+
+TO FIX: Go into VSC settings (Code > Preferences > Settings) and set `http.systemCertificates: false`. Then restart VSC. It should work after this!
+
+![](./vsc-http-sys-cert.png)
+
+[Don't hesitate to contact us if you have any questions about this.](mailto:bram+feedback@stenography.dev)
 
 ## [Get the Extension on the VSC Marketplace](https://marketplace.visualstudio.com/items?itemName=Stenography.stenography)
 
@@ -162,3 +176,7 @@ Initial release of Stenography Extension!
 
 - `node-fetch()` -> `axios`. Should hopefully adress any certificate expiration issues. [Please reach out to me if you are still experiencing this bug](mailto:bram+feedback@stenography.dev)
 *Huge thanks to AxiomaAbsurdo for helping me find this bug!!*
+
+### 1.2.1
+
+- README update for `http.systemCertificate` error
