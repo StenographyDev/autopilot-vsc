@@ -4,11 +4,13 @@ import axios from 'axios';
 export const FILETYPES:any = {
 	"ts": "typescript",
 	"tsx": "tsx",
+	"jsx": "javascript",
 	"js": "javascript",
 	"py": "python",
 	"html": "html",
     "rb": "ruby",
 	"vue": "vue",
+	"sol": "solidity",
 };
 
 export const CACHE_NAME = "stenographyCache";

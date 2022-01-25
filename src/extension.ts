@@ -93,11 +93,13 @@ export const fetchStenographyAutopilot = async (code: string, language: string, 
 const FILETYPES:any = {
 	"ts": "typescript",
 	"tsx": "tsx",
+	"jsx": "javascript",
 	"js": "javascript",
 	"py": "python",
 	"html": "html",
 	"rb": "ruby",
 	"vue": "vue",
+	"sol": "solidity",
 };
 
 const logic = async (editor: vscode.TextEditor | undefined, isDryRun = true) => {
@@ -195,6 +197,7 @@ const logic = async (editor: vscode.TextEditor | undefined, isDryRun = true) => 
 					switch (language) {
 						case 'typescript':
 						case 'tsx':
+						case 'solidity':
 						case 'javascript':
 							editor?.edit(edit => {
 								linesA.forEach((line:any) => {

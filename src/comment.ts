@@ -32,6 +32,8 @@ export function commentGenerator(line:any, startChar: number, language:string): 
     const commentTypes:any = {
         'typescript': { start: '/*', end: '*/' },
         'tsx': { start: '/*', end: '*/' },
+        'jsx': { start: '/*', end: '*/' },
+        'solidity': { start: '/*', end: '*/' },
         'javascript': { start: '/*', end: '*/' },
         'html': { start: '<!--', end: '-->' },
         'css': { start: '/*', end: '*/' },

@@ -1,5 +1,9 @@
 # stenography-autopilot-vsc README
 
+**Watch this video to get set up**
+
+[![plain 2 explained](plain-to-explained.png)](https://www.youtube.com/watch?v=8sDsMUUcrtM&ab_channel=BramAdams)
+
 # -->  LINUX AND WINDOWS USERS: READ THIS <---
 
 You may run into an error that looks like this: `certificate has expired`
@@ -26,6 +30,8 @@ Current language support:
 - HTML
 - Ruby
 - Vue
+- Solidity
+- JSX
 
 New languages are continously being added! [Follow Stenography on Twitter](https://twitter.com/StenographyDev) to be kept up to date about new languages. 
 
@@ -180,3 +186,8 @@ Initial release of Stenography Extension!
 ### 1.2.1
 
 - README update for `http.systemCertificate` error
+
+### 1.2.2
+
+- Solidity added!
+- JSX added!
